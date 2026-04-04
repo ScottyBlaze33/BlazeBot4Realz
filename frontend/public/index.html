@@ -447,13 +447,16 @@ async function generateImage(prompt) {
                 image_size: "landscape_16_9",
                 num_inference_steps: 8,
                 num_images: 1,
-                enable_safety_checker: true
+                enable_safety_checker: false
             })
         });
         
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Fal.ai API error:', errorText);
+            console.error('Fal.ai API error response:', errorText);
+            console.error('Status:', response.status);
+            console.error('Headers:', response.headers);
+            alert(`Image generation failed: ${response.status} - ${errorText}`);
             throw new Error(`Fal.ai error: ${response.status} - ${errorText}`);
         }
         
