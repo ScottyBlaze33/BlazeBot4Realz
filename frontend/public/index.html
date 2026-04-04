@@ -5,7 +5,6 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>BLAZEBOT - Obsidian Monolith</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fal-ai/client@1.1.0/dist/index.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -426,35 +425,45 @@ async function sendChatMessage(message, includeImage = false) {
 }
 
 /**
- * Fal.ai Image Generation
+ * Fal.ai Z-Image Turbo Generation using REST API
  */
 async function generateImage(prompt) {
     const keys = getAPIKeys();
     
-    // Configure fal client
-    fal.config({
-        credentials: keys.fal
-    });
-    
     try {
-        const result = await fal.subscribe(API_CONFIG.fal.model, {
-            input: {
+        console.log('Generating image with Z-Image Turbo:', prompt);
+        
+        const response = await fetch('https://fal.run/fal-ai/z-image/turbo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Key ${keys.fal}`
+            },
+            body: JSON.stringify({
                 prompt: prompt,
                 image_size: "landscape_16_9",
                 num_inference_steps: 8,
-                num_images: 1
-            },
-            logs: true,
-            onQueueUpdate: (update) => {
-                if (update.status === "IN_PROGRESS") {
-                    console.log('Generating image...', update);
-                }
-            }
+                num_images: 1,
+                enable_safety_checker: true
+            })
         });
         
-        return result.data.images[0].url;
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Fal.ai API error:', errorText);
+            throw new Error(`Fal.ai error: ${response.status} - ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Fal.ai response:', data);
+        
+        if (data.images && data.images.length > 0) {
+            return data.images[0].url;
+        } else {
+            throw new Error('No images returned from Fal.ai');
+        }
     } catch (error) {
-        console.error('Fal.ai error:', error);
+        console.error('Image generation error:', error);
         throw error;
     }
 }
