@@ -1,158 +1,487 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="A product of emergent.sh" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
-        <!--
-        manifest.json provides metadata used when your web app is installed on a
-        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-        -->
-        <!--
-        Notice the use of %PUBLIC_URL% in the tags above.
-        It will be replaced with the URL of the `public` folder during the build.
-        Only files inside the `public` folder can be referenced from the HTML.
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
 
-        Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-        work correctly both with client-side routing and a non-root public URL.
-        Learn how to configure a non-root public URL by running `npm run build`.
-        -->
-        <title>Emergent | Fullstack App</title>
-        <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
-        <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
-    </head>
-    <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div id="root"></div>
-        <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+Copyright (c) 2026 by ScottyBlaze33 (http://jsbin.com/jokiget/1/edit)
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-        <a
-            id="emergent-badge"
-            target="_blank"
-            href="https://app.emergent.sh/?utm_source=emergent-badge"
-            style="
-                display: inline-flex !important;
-                box-sizing: border-box;
-                width: 178px;
-                height: 40px;
-                padding: 8px 12px 8px 12px;
-                align-items: center !important;
-                gap: 8px;
-                border-radius: 50px !important;
-                background: #000 !important;
-                position: fixed !important;
-                bottom: 16px;
-                right: 16px;
-                text-decoration: none;
-                font-family: -apple-system, BlinkMacSystemFont,
-                    &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell,
-                    &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;,
-                    sans-serif !important;
-                font-size: 12px !important;
-                z-index: 9999 !important;
-            "
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M15.5702 8.13142C15.7729 8.0412 16.0007 8.18878 15.9892 8.4103C15.8374 11.3192 14.0965 14.0405 11.2531 15.3065C8.40964 16.5725 5.2224 16.0453 2.95912 14.2117C2.78676 14.072 2.82955 13.804 3.03219 13.7137L4.95677 12.8568C5.04866 12.8159 5.15446 12.823 5.24204 12.8725C6.73377 13.7153 8.59176 13.8649 10.2772 13.1145C11.9626 12.3641 13.0947 10.8833 13.4665 9.21075C13.4883 9.11256 13.5539 9.02918 13.6457 8.98827L15.5702 8.13142Z" fill="white"/>
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.3066 4.74698L15.5067 5.19653C15.5759 5.35178 15.5061 5.53366 15.3508 5.60278L1.29992 11.8586C1.14467 11.9278 0.962794 11.8579 0.893675 11.7027L0.701732 11.2716L0.693457 11.2531C-1.10317 7.21778 0.711626 2.49007 4.74692 0.693443C8.78221 -1.10318 13.51 0.711693 15.3066 4.74698ZM2.82356 8.55367C2.63552 8.63739 2.41991 8.51617 2.40853 8.31065C2.28373 6.05724 3.53858 3.85787 5.72286 2.88536C7.90715 1.91286 10.3813 2.45199 11.9724 4.05256C12.1175 4.19854 12.0633 4.43988 11.8753 4.5236L2.82356 8.55367Z" fill="white"/>
-            </svg>
-            <p
-                style="
-                    color: #FFF !important;
-                    font-family: 'Inter', sans-serif !important;
-                    font-size: 13px !important;
-                    font-style: normal !important;
-                    font-weight: 600 !important;
-                    line-height: 20px !important;
-                    margin: 0 !important;
-                    white-space: nowrap !important;
-                "
-            >
-                Made with Emergent
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BLAZEBOT - Obsidian Monolith</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ff2d75",
+                        "primary-dim": "#e40b63",
+                        background: "#0e0e0e",
+                        surface: "#131313",
+                        "surface-container": "#191919",
+                        "surface-container-high": "#1f1f1f",
+                        "on-surface": "#ffffff",
+                        "on-surface-variant": "#ababab",
+                        outline: "#484848"
+                    },
+                    fontFamily: {
+                        headline: ["Manrope", "sans-serif"],
+                        body: ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "2rem",
+                        xl: "3rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .page-transition {
+            display: none;
+        }
+        .page-transition.active {
+            display: block;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #484848;
+            border-radius: 10px;
+        }
+        .style-option.selected {
+            border-color: #ff2d75 !important;
+            opacity: 1 !important;
+        }
+        .style-option.selected .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
+<!-- Global Header -->
+<header class="bg-background/80 backdrop-blur-xl fixed top-0 w-full z-50 h-16 flex justify-between items-center px-6 border-b border-white/5">
+<div class="flex items-center gap-3">
+<img alt="BlazeBot Logo" class="w-8 h-8 object-contain rounded-lg" src="https://lh3.googleusercontent.com/aida/ADBb0ui6QskyNIJZxITYQ9dL2oWscmg7S7iPovNQlwyPA0XRDoai7yn_F8mCVS9m8kg7G1blXTtTavJDC7ApnkjkKI1EHbM6TBrhgM5mI9zCiWFLje1SFxjS0Azg9l8PfvTDiA3Ae48kIxq9STgkBh52GV_fTMzlkT9I_TmE80qNnorQPvs04x6rgQBykN-Qo73goAMQNFpL41sNaPHtLn29SIjoy3hQwvl63H8YZcSMu6-VzXZpfw71aJwTn3DHpYw2rTiuIvHAMhzK"/>
+<h1 class="text-xl font-black tracking-[0.2em] text-primary font-headline uppercase">BLAZEBOT</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">terminal</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">more_vert</span>
+</div>
+</header>
+<main class="pt-20 pb-32 px-4 max-w-2xl mx-auto min-h-screen relative">
+<!-- AI Pulse Decoration -->
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] -z-10 pointer-events-none"></div>
+<!-- 1. CHAT PAGE -->
+<section class="page-transition active space-y-6" id="page-chat">
+<div class="flex flex-col gap-6">
+<!-- Received Message -->
+<div class="flex flex-col items-start max-w-[85%]">
+<div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
+<p class="text-on-surface-variant leading-relaxed">Neural link established. How shall we synthesize the future today, Architect?</p>
+</div>
+<span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">SYSTEM SYNCED</span>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end max-w-[85%] self-end">
+<div class="bg-primary text-white rounded-2xl rounded-tr-none p-4 shadow-lg shadow-primary/10">
+<p class="font-medium">Generate a conceptual render of a obsidian monolith in a neon-lit rain forest.</p>
+</div>
+</div>
+<!-- AI Response with Image -->
+<div class="flex flex-col items-start max-w-[95%]">
+<div class="bg-surface-container rounded-2xl rounded-tl-none overflow-hidden p-2 space-y-3 border border-white/5">
+<img alt="monolithic obsidian structure" class="w-full aspect-video object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtJ12ozqu_pcBkC5P-ZCggZeMMd1yflPfqHFKtkPR02VsCUFELhfxn8XfKktcPntvwEzARDT30yvNpbquKhrl9GMPbw4uhdAQJaVeYD7Mai3Ek4kHja65e6tvs4C-S5iOZgpQJeCfKQg6fAWQb5Oz6T5X7DpCzbWEjL3xeAEFFekhjpNwz4IFgWS4RCBhhrw_zbGAbq6KLhx7DtrZyA23gqFeAye525jCyD4y49b1b1-bUxHgge6oYlr95CmCemZHgLQQA6uRMTmE"/>
+<div class="px-2 pb-2">
+<p class="text-on-surface-variant text-sm">Visual synthesis complete. The contrast between the organic growth and geometric precision creates a high-entropy aesthetic.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Chat Input -->
+<div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-40">
+<div class="bg-surface border border-outline/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">image_search</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Prompt the Monolith..." type="text"/>
+<button class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 2. FORGE PAGE -->
+<section class="page-transition space-y-8" id="page-forge">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">Character Forge</h2>
+<div class="flex gap-1">
+<div class="w-6 h-1 rounded-full transition-colors duration-300 bg-primary" id="forge-dot-1"></div>
+<div class="w-6 h-1 rounded-full transition-colors duration-300 bg-surface-container" id="forge-dot-2"></div>
+<div class="w-6 h-1 rounded-full transition-colors duration-300 bg-surface-container" id="forge-dot-3"></div>
+</div>
+</div>
+<!-- Step 1: Identity -->
+<div class="forge-step space-y-6" id="forge-step-1">
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Name</label>
+<input class="w-full bg-surface-container border-none rounded-xl p-4 text-white focus:ring-1 focus:ring-primary/40" placeholder="Enter Character Name..." type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Gender Identity</label>
+<div class="grid grid-cols-3 gap-3">
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-primary/40 cursor-pointer" onclick="selectGender(this)">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">man</span>
+<span class="text-[10px] font-bold">MAN</span>
+</div>
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-white/5 cursor-pointer opacity-50" onclick="selectGender(this)">
+<span class="material-symbols-outlined">woman</span>
+<span class="text-[10px] font-bold">WOMAN</span>
+</div>
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-white/5 cursor-pointer opacity-50" onclick="selectGender(this)">
+<span class="material-symbols-outlined">transgender</span>
+<span class="text-[10px] font-bold">NON-BINARY</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Introduction / World View</label>
+<textarea class="w-full bg-surface-container border-none rounded-xl p-4 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="Describe their essence..." rows="3"></textarea>
+</div>
+<button class="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all" onclick="nextForgeStep(2)">PROCEED TO IMAGE GEN</button>
+</div>
+<!-- Step 2: Image Gen -->
+<div class="forge-step hidden space-y-6" id="forge-step-2">
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Visual Prompt</label>
+<textarea class="w-full bg-surface-container border-none rounded-xl p-4 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="A futuristic cyborg with neon accents..." rows="4"></textarea>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Aesthetic Style</label>
+<div class="grid grid-cols-3 gap-3">
+<div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-primary/40 selected cursor-pointer transition-all" onclick="selectStyle(this)">
+<span class="material-symbols-outlined text-primary">palette</span>
+<span class="text-[10px] mt-1">REALISTIC</span>
+</div>
+<div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" onclick="selectStyle(this)">
+<span class="material-symbols-outlined">brush</span>
+<span class="text-[10px] mt-1">ANIME</span>
+</div>
+<div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" onclick="selectStyle(this)">
+<span class="material-symbols-outlined">auto_fix_high</span>
+<span class="text-[10px] mt-1">COMIC</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 py-4 bg-surface-container text-white font-bold rounded-xl" onclick="nextForgeStep(1)">BACK</button>
+<button class="flex-[2] py-4 bg-primary text-white font-bold rounded-xl shadow-lg" onclick="nextForgeStep(3)">CONTINUE TO VOICE</button>
+</div>
+</div>
+<!-- Step 3: Voice -->
+<div class="forge-step hidden space-y-6" id="forge-step-3">
+<div class="space-y-4">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Voice Archetype</label>
+<div class="space-y-2">
+<div class="voice-option bg-surface-container p-4 rounded-xl border border-primary/40 flex justify-between items-center cursor-pointer" onclick="selectVoice(this)">
+<div>
+<p class="font-bold text-sm">The Architect</p>
+<p class="text-[10px] text-on-surface-variant">Calm, precise, analytical</p>
+</div>
+<span class="material-symbols-outlined text-primary">play_circle</span>
+</div>
+<div class="voice-option bg-surface-container p-4 rounded-xl border border-white/5 flex justify-between items-center opacity-50 cursor-pointer" onclick="selectVoice(this)">
+<div>
+<p class="font-bold text-sm">The Rogue</p>
+<p class="text-[10px] text-on-surface-variant">Raspy, energetic, sharp</p>
+</div>
+<span class="material-symbols-outlined">play_circle</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant px-1 uppercase tracking-widest">
+<span>Stability</span>
+<span class="text-primary">75%</span>
+</div>
+<input class="w-full h-1 bg-surface-container accent-primary rounded-full appearance-none cursor-pointer" max="100" min="0" type="range" value="75"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant px-1 uppercase tracking-widest">
+<span>Clarity</span>
+<span class="text-primary">90%</span>
+</div>
+<input class="w-full h-1 bg-surface-container accent-primary rounded-full appearance-none cursor-pointer" max="100" min="0" type="range" value="90"/>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 py-4 bg-surface-container text-white font-bold rounded-xl" onclick="nextForgeStep(2)">BACK</button>
+<button class="flex-[2] py-4 bg-primary text-white font-bold rounded-xl shadow-lg uppercase tracking-widest">Ignite Genesis</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. CIRCUIT PAGE -->
+<section class="page-transition space-y-8" id="page-circuit">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Circuit</h2>
+<p class="text-on-surface-variant text-xs">Active Companion Manifest</p>
+</div>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black">5/5 UNITS ONLINE</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2 bg-surface-container rounded-2xl overflow-hidden group border border-white/5 relative h-48">
+<img alt="AEON-01" class="w-full h-full object-cover grayscale brightness-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbW08yGKBdEY-kBIIfMt41eg8p8y0ekG-2KpXS5aSW1UYyYqNJObcgDbXLtD6WTtEfDLjgdBh4zNhp40I5A1F9-jfWBKGMXU07daso2jgb6ultxYSfDihNpjaFTJCbjotH-VkQNg0_lgPef-H0jrqwqz3R_R1XUOSUONt9MIj45BSnxeO_h2MVcElJrlbB4DUukEypgyLrff-bPbCL-wmCSYbHa9w3_r-S382t6IIO8dsY1BD4ymTzG0Q4QWyB4qC1HDVW225I_3g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<h3 class="font-bold text-lg">AEON-01</h3>
+<p class="text-[10px] tracking-widest text-primary uppercase">Tactical Advisor</p>
+</div>
+<div class="absolute top-4 right-4 bg-primary w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_#ff2d75]"></div>
+</div>
+<div class="bg-surface-container p-4 rounded-2xl space-y-3 border border-white/5">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<div>
+<h4 class="text-sm font-bold">NOVA_AI</h4>
+<p class="text-[10px] text-on-surface-variant">Creative Catalyst</p>
+</div>
+</div>
+<div class="bg-surface-container p-4 rounded-2xl space-y-3 border border-white/5">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">shield</span>
+</div>
+<div>
+<h4 class="text-sm font-bold">VANGUARD</h4>
+<p class="text-[10px] text-on-surface-variant">Security Protocol</p>
+</div>
+</div>
+<div class="bg-surface-container p-4 rounded-2xl flex items-center gap-4 border border-white/5">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASkQqe35KdIzEsPmyr5j_l0LdcGIoA_YDFiiAi79K-662gTnLtHl-Sc_MMVUE6_YzMX7Hc3ai_iRVU0UH79YVKlMSQeC1IUiq4E5E2fC0jhsb0zBzN-6T_hGvRfFotTYL8p5wGUn_R9CnHO7nK-VJNmnDln-8Nsw-Zbqcj-qiTtb4U4snP5fVkZecxg2I8hp9D1iFgVkWQutg6oPUoANhGbn3DFM_6cjSbqMHmdll1-P61tk-eKfZhfS_y5HbaUEQChYsSTMrez9E"/>
+</div>
+<div>
+<h4 class="text-sm font-bold">LUNA</h4>
+<p class="text-[10px] text-on-surface-variant">Linguistic AI</p>
+</div>
+</div>
+<div class="bg-surface-container p-4 rounded-2xl flex items-center gap-4 border border-white/5">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN6pK1eg754_YZuh5ZdLSTvUXilUJT1vvypAUB-5zATrZtRKdFCJ5QrzbeUTu1kJN1fVoib6U1ClGl8b3oy9qP-9OPJ5m8ubWQ9gB783-Xvb_mxEo5Q1mmBCVTVRHawMKrHOYQOFwJd8XZ0ypxLO5ktu-y_-XS2vlxhqUX_KX5GApyjzVb-aOSBn45Q-ngBuh0gIA3azqxpREyldFxW_RZcyk9Eok6hmIfw9zFvDXcOLTSzcC-0iHsKfVQGHJsBlxRr38-QuolLzQ"/>
+</div>
+<div>
+<h4 class="text-sm font-bold">KRONOS</h4>
+<p class="text-[10px] text-on-surface-variant">Logic Engine</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. API / SETTINGS PAGE -->
+<section class="page-transition space-y-8" id="page-api">
+<div class="text-center space-y-2">
+<span class="material-symbols-outlined text-primary text-4xl">hub</span>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">Configuration Hub</h2>
+<p class="text-on-surface-variant text-xs">Connect your external neural nodes</p>
+</div>
+<div class="space-y-4">
+<!-- DeepSeek -->
+<div class="bg-surface-container p-6 rounded-2xl space-y-4 border border-white/5">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background flex items-center justify-center text-primary font-bold text-xs">DS</div>
+<span class="font-bold">DeepSeek R1</span>
+</div>
+<span class="text-[10px] text-primary font-bold px-2 py-1 bg-primary/10 rounded uppercase">Connected</span>
+</div>
+<div class="relative">
+<input class="w-full bg-background border-none rounded-xl p-3 text-sm font-mono text-on-surface-variant" type="password" value="sk-dseek-••••••••"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-sm">visibility_off</span>
+</div>
+</div>
+<!-- Fal.ai -->
+<div class="bg-surface-container p-6 rounded-2xl space-y-4 border border-white/5">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background flex items-center justify-center text-blue-400 font-bold text-xs">FL</div>
+<span class="font-bold">Fal.ai Flux</span>
+</div>
+<span class="text-[10px] text-outline font-bold px-2 py-1 bg-surface-container-high rounded uppercase">No Key</span>
+</div>
+<input class="w-full bg-background border-none rounded-xl p-3 text-sm font-mono text-on-surface-variant placeholder:text-outline/50" placeholder="Enter Fal.ai API Key" type="text"/>
+</div>
+<!-- ElevenLabs -->
+<div class="bg-surface-container p-6 rounded-2xl space-y-4 border border-white/5">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background flex items-center justify-center text-green-400 font-bold text-xs">11</div>
+<span class="font-bold">Eleven Labs</span>
+</div>
+<span class="text-[10px] text-red-500 font-bold px-2 py-1 bg-red-500/10 rounded uppercase">Invalid</span>
+</div>
+<input class="w-full bg-background border border-red-500/20 rounded-xl p-3 text-sm font-mono text-red-500/80" type="password" value="sk_invalid_token"/>
+</div>
+</div>
+<p class="text-center text-[10px] text-on-surface-variant/40 max-w-[200px] mx-auto uppercase tracking-tighter">
+                Keys are stored locally within the obsidian monolith.
             </p>
-        </a>
-        <script>
-            !(function (t, e) {
-                var o, n, p, r;
-                e.__SV ||
-                    ((window.posthog = e),
-                    (e._i = []),
-                    (e.init = function (i, s, a) {
-                        function g(t, e) {
-                            var o = e.split(".");
-                            2 == o.length && ((t = t[o[0]]), (e = o[1])),
-                                (t[e] = function () {
-                                    t.push(
-                                        [e].concat(
-                                            Array.prototype.slice.call(
-                                                arguments,
-                                                0,
-                                            ),
-                                        ),
-                                    );
-                                });
-                        }
-                        ((p = t.createElement("script")).type =
-                            "text/javascript"),
-                            (p.crossOrigin = "anonymous"),
-                            (p.async = !0),
-                            (p.src =
-                                s.api_host.replace(
-                                    ".i.posthog.com",
-                                    "-assets.i.posthog.com",
-                                ) + "/static/array.js"),
-                            (r =
-                                t.getElementsByTagName(
-                                    "script",
-                                )[0]).parentNode.insertBefore(p, r);
-                        var u = e;
-                        for (
-                            void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
-                                u.people = u.people || [],
-                                u.toString = function (t) {
-                                    var e = "posthog";
-                                    return (
-                                        "posthog" !== a && (e += "." + a),
-                                        t || (e += " (stub)"),
-                                        e
-                                    );
-                                },
-                                u.people.toString = function () {
-                                    return u.toString(1) + ".people (stub)";
-                                },
-                                o =
-                                    "init me ws ys ps bs capture je Di ks register register_once register_for_session unregister unregister_for_session Ps getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Es $s createPersonProfile Is opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing Ss debug xs getPageViewId captureTraceFeedback captureTraceMetric".split(
-                                        " ",
-                                    ),
-                                n = 0;
-                            n < o.length;
-                            n++
-                        )
-                            g(u, o[n]);
-                        e._i.push([i, s, a]);
-                    }),
-                    (e.__SV = 1));
-            })(document, window.posthog || []);
-            posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
-                api_host: "https://us.i.posthog.com",
-                person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well,
-                session_recording: {
-                    recordCrossOriginIframes: true,
-                    capturePerformance: false,
-                },
+</section>
+</main>
+<!-- Global Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-background/80 backdrop-blur-xl z-50 rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(255,45,117,0.1)] border-t border-white/5">
+<button class="nav-item flex flex-col items-center justify-center text-primary bg-surface-container-high rounded-full px-6 py-2 transition-all" id="nav-chat" onclick="showPage('chat')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forum</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">Chat</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-forge" onclick="showPage('forge')">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">Forge</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-circuit" onclick="showPage('circuit')">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">Circuit</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-api" onclick="showPage('api')">
+<span class="material-symbols-outlined">api</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">API</span>
+</button>
+</nav>
+<script>
+        /** 
+         * Robust SPA Router 
+         */
+        const AppRouter = {
+            currentPage: 'chat',
+            pages: ['chat', 'forge', 'circuit', 'api'],
+
+            init() {
+                // Initialize event listeners or initial states if needed
+                this.showPage(this.currentPage);
+            },
+
+            showPage(pageId) {
+                if (!this.pages.includes(pageId)) return;
+                this.currentPage = pageId;
+
+                // Hide all main pages
+                document.querySelectorAll('.page-transition').forEach(page => {
+                    page.classList.remove('active');
+                });
+
+                // Show target page
+                const targetPage = document.getElementById('page-' + pageId);
+                if (targetPage) targetPage.classList.add('active');
+
+                // Update Navigation Styling
+                this.updateNav(pageId);
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            updateNav(activeId) {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('text-primary', 'bg-surface-container-high');
+                    nav.classList.add('text-on-surface-variant');
+                    const icon = nav.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+                });
+
+                const activeNav = document.getElementById('nav-' + activeId);
+                if (activeNav) {
+                    activeNav.classList.remove('text-on-surface-variant');
+                    activeNav.classList.add('text-primary', 'bg-surface-container-high');
+                    const activeIcon = activeNav.querySelector('.material-symbols-outlined');
+                    if (activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
+                }
+            }
+        };
+
+        // Global functions for inline onclick handlers
+        function showPage(pageId) {
+            AppRouter.showPage(pageId);
+        }
+
+        /**
+         * Character Forge Step Manager
+         */
+        function nextForgeStep(step) {
+            // Hide all forge steps
+            document.querySelectorAll('.forge-step').forEach(s => s.classList.add('hidden'));
+            
+            // Show requested step
+            const targetStep = document.getElementById('forge-step-' + step);
+            if (targetStep) targetStep.classList.remove('hidden');
+
+            // Update Progress Dots
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('forge-dot-' + i);
+                if (dot) {
+                    if (i <= step) {
+                        dot.classList.remove('bg-surface-container');
+                        dot.classList.add('bg-primary');
+                    } else {
+                        dot.classList.remove('bg-primary');
+                        dot.classList.add('bg-surface-container');
+                    }
+                }
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /**
+         * Visual Selection Handlers
+         */
+        function selectStyle(element) {
+            document.querySelectorAll('.style-option').forEach(opt => {
+                opt.classList.remove('selected', 'border-primary/40');
+                opt.classList.add('border-white/5', 'opacity-50');
             });
-        </script>
-    </body>
-</html>
+            element.classList.add('selected', 'border-primary/40');
+            element.classList.remove('border-white/5', 'opacity-50');
+        }
+
+        function selectGender(element) {
+            document.querySelectorAll('.gender-option').forEach(opt => {
+                opt.classList.remove('border-primary/40');
+                opt.classList.add('border-white/5', 'opacity-50');
+                opt.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 0";
+            });
+            element.classList.add('border-primary/40');
+            element.classList.remove('border-white/5', 'opacity-50');
+            element.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+        }
+
+        function selectVoice(element) {
+            document.querySelectorAll('.voice-option').forEach(opt => {
+                opt.classList.remove('border-primary/40');
+                opt.classList.add('border-white/5', 'opacity-50');
+            });
+            element.classList.add('border-primary/40');
+            element.classList.remove('border-white/5', 'opacity-50');
+        }
+
+        // Run router on load
+        AppRouter.init();
+    </script>
+</body></html>
