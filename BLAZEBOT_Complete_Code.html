@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BLAZEBOT - Obsidian Monolith</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ff2d75",
+                        "primary-dim": "#e40b63",
+                        background: "#0e0e0e",
+                        surface: "#131313",
+                        "surface-container": "#191919",
+                        "surface-container-high": "#1f1f1f",
+                        "on-surface": "#ffffff",
+                        "on-surface-variant": "#ababab",
+                        outline: "#484848"
+                    },
+                    fontFamily: {
+                        headline: ["Manrope", "sans-serif"],
+                        body: ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "2rem",
+                        xl: "3rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .page-transition {
+            display: none;
+        }
+        .page-transition.active {
+            display: block;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #484848;
+            border-radius: 10px;
+        }
+        .style-option.selected {
+            border-color: #ff2d75 !important;
+            opacity: 1 !important;
+        }
+        .style-option.selected .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
+<!-- Global Header -->
+<header class="bg-background/80 backdrop-blur-xl fixed top-0 w-full z-50 h-16 flex justify-between items-center px-6 border-b border-white/5">
+<div class="flex items-center gap-3">
+<img alt="BlazeBot Logo" class="w-8 h-8 object-contain rounded-lg" src="https://lh3.googleusercontent.com/aida/ADBb0ui6QskyNIJZxITYQ9dL2oWscmg7S7iPovNQlwyPA0XRDoai7yn_F8mCVS9m8kg7G1blXTtTavJDC7ApnkjkKI1EHbM6TBrhgM5mI9zCiWFLje1SFxjS0Azg9l8PfvTDiA3Ae48kIxq9STgkBh52GV_fTMzlkT9I_TmE80qNnorQPvs04x6rgQBykN-Qo73goAMQNFpL41sNaPHtLn29SIjoy3hQwvl63H8YZcSMu6-VzXZpfw71aJwTn3DHpYw2rTiuIvHAMhzK"/>
+<h1 class="text-xl font-black tracking-[0.2em] text-primary font-headline uppercase">BLAZEBOT</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">terminal</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">more_vert</span>
+</div>
+</header>
+<main class="pt-20 pb-32 px-4 max-w-2xl mx-auto min-h-screen relative">
+<!-- AI Pulse Decoration -->
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] -z-10 pointer-events-none"></div>
+<!-- 1. CHAT PAGE -->
+<section class="page-transition active space-y-6" id="page-chat">
+<div class="flex flex-col gap-6" id="chat-messages">
+<!-- Initial welcome message -->
+<div class="flex flex-col items-start max-w-[85%]">
+<div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
+<p class="text-on-surface-variant leading-relaxed">Neural link established. How shall we synthesize the future today, Architect?</p>
+</div>
+<span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">SYSTEM SYNCED</span>
+</div>
+</div>
+<!-- Sticky Chat Input -->
+<div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-40">
+<div class="bg-surface border border-outline/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
+<button id="image-gen-btn" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">image_search</span>
+</button>
+<input id="chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Prompt the Monolith..." type="text"/>
+<button id="send-btn" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</section>
+
+<!-- 2. FORGE PAGE -->
+<section class="page-transition space-y-8" id="page-forge">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">Character Forge</h2>
+<div class="flex gap-1">
+<div class="w-6 h-1 rounded-full transition-colors duration-300 bg-primary" id="forge-dot-1"></div>
+<div class="w-6 h-1 rounded-full transition-colors duration-300 bg-surface-container" id="forge-dot-2"></div>
+<div class="w-6 h-1 rounded-full transition-colors duration-300 bg-surface-container" id="forge-dot-3"></div>
+</div>
+</div>
+<!-- Step 1: Identity -->
+<div class="forge-step space-y-6" id="forge-step-1">
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Name</label>
+<input id="char-name" class="w-full bg-surface-container border-none rounded-xl p-4 text-white focus:ring-1 focus:ring-primary/40" placeholder="Enter Character Name..." type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Gender Identity</label>
+<div class="grid grid-cols-3 gap-3">
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-primary/40 cursor-pointer" data-gender="man" onclick="selectGender(this)">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">man</span>
+<span class="text-[10px] font-bold">MAN</span>
+</div>
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-white/5 cursor-pointer opacity-50" data-gender="woman" onclick="selectGender(this)">
+<span class="material-symbols-outlined">woman</span>
+<span class="text-[10px] font-bold">WOMAN</span>
+</div>
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-white/5 cursor-pointer opacity-50" data-gender="non-binary" onclick="selectGender(this)">
+<span class="material-symbols-outlined">transgender</span>
+<span class="text-[10px] font-bold">NON-BINARY</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Introduction / World View</label>
+<textarea id="char-intro" class="w-full bg-surface-container border-none rounded-xl p-4 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="Describe their essence..." rows="3"></textarea>
+</div>
+<button class="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all" onclick="nextForgeStep(2)">PROCEED TO IMAGE GEN</button>
+</div>
+<!-- Step 2: Image Gen -->
+<div class="forge-step hidden space-y-6" id="forge-step-2">
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Visual Prompt</label>
+<textarea id="char-visual-prompt" class="w-full bg-surface-container border-none rounded-xl p-4 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="A futuristic cyborg with neon accents..." rows="4"></textarea>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Aesthetic Style</label>
+<div class="grid grid-cols-3 gap-3">
+<div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-primary/40 selected cursor-pointer transition-all" data-style="realistic" onclick="selectStyle(this)">
+<span class="material-symbols-outlined text-primary">palette</span>
+<span class="text-[10px] mt-1">REALISTIC</span>
+</div>
+<div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-style="anime" onclick="selectStyle(this)">
+<span class="material-symbols-outlined">brush</span>
+<span class="text-[10px] mt-1">ANIME</span>
+</div>
+<div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-style="comic" onclick="selectStyle(this)">
+<span class="material-symbols-outlined">auto_fix_high</span>
+<span class="text-[10px] mt-1">COMIC</span>
+</div>
+</div>
+</div>
+<div id="char-image-preview" class="hidden">
+<img id="char-generated-image" class="w-full rounded-xl" alt="Generated character"/>
+</div>
+<button id="generate-char-image-btn" class="w-full py-4 bg-primary/20 text-primary font-bold rounded-xl" onclick="generateCharacterImage()">GENERATE IMAGE</button>
+<div class="flex gap-4">
+<button class="flex-1 py-4 bg-surface-container text-white font-bold rounded-xl" onclick="nextForgeStep(1)">BACK</button>
+<button class="flex-[2] py-4 bg-primary text-white font-bold rounded-xl shadow-lg" onclick="nextForgeStep(3)">CONTINUE TO VOICE</button>
+</div>
+</div>
+<!-- Step 3: Voice -->
+<div class="forge-step hidden space-y-6" id="forge-step-3">
+<div class="space-y-4">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Voice Archetype</label>
+<div class="space-y-2">
+<div class="voice-option bg-surface-container p-4 rounded-xl border border-primary/40 flex justify-between items-center cursor-pointer" data-voice="pNInz6obpgDQGcFmaJgB" onclick="selectVoice(this)">
+<div>
+<p class="font-bold text-sm">The Architect</p>
+<p class="text-[10px] text-on-surface-variant">Calm, precise, analytical</p>
+</div>
+<span class="material-symbols-outlined text-primary play-voice-btn" onclick="event.stopPropagation(); playVoicePreview('pNInz6obpgDQGcFmaJgB', 'Hello, I am your AI companion.')">play_circle</span>
+</div>
+<div class="voice-option bg-surface-container p-4 rounded-xl border border-white/5 flex justify-between items-center opacity-50 cursor-pointer" data-voice="N2lVS1w4EtoT3dr4eOWO" onclick="selectVoice(this)">
+<div>
+<p class="font-bold text-sm">The Rogue</p>
+<p class="text-[10px] text-on-surface-variant">Raspy, energetic, sharp</p>
+</div>
+<span class="material-symbols-outlined play-voice-btn" onclick="event.stopPropagation(); playVoicePreview('N2lVS1w4EtoT3dr4eOWO', 'Ready for action!')">play_circle</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant px-1 uppercase tracking-widest">
+<span>Stability</span>
+<span class="text-primary" id="stability-value">75%</span>
+</div>
+<input id="stability-slider" class="w-full h-1 bg-surface-container accent-primary rounded-full appearance-none cursor-pointer" max="100" min="0" type="range" value="75" onchange="document.getElementById('stability-value').textContent = this.value + '%'"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold text-on-surface-variant px-1 uppercase tracking-widest">
+<span>Clarity</span>
+<span class="text-primary" id="clarity-value">90%</span>
+</div>
+<input id="clarity-slider" class="w-full h-1 bg-surface-container accent-primary rounded-full appearance-none cursor-pointer" max="100" min="0" type="range" value="90" onchange="document.getElementById('clarity-value').textContent = this.value + '%'"/>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 py-4 bg-surface-container text-white font-bold rounded-xl" onclick="nextForgeStep(2)">BACK</button>
+<button class="flex-[2] py-4 bg-primary text-white font-bold rounded-xl shadow-lg uppercase tracking-widest" onclick="createCharacter()">Ignite Genesis</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 3. CIRCUIT PAGE -->
+<section class="page-transition space-y-8" id="page-circuit">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Circuit</h2>
+<p class="text-on-surface-variant text-xs">Active Companion Manifest</p>
+</div>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="circuit-count">0/5 UNITS ONLINE</div>
+</div>
+<div class="grid grid-cols-2 gap-4" id="character-grid">
+<div class="col-span-2 text-center text-on-surface-variant py-12">
+<p>No characters created yet. Visit the Forge to create your first companion.</p>
+</div>
+</div>
+</section>
+
+<!-- 4. API / SETTINGS PAGE -->
+<section class="page-transition space-y-8" id="page-api">
+<div class="text-center space-y-2">
+<span class="material-symbols-outlined text-primary text-4xl">hub</span>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">Configuration Hub</h2>
+<p class="text-on-surface-variant text-xs">Connect your external neural nodes</p>
+</div>
+<div class="space-y-4">
+<!-- DeepSeek -->
+<div class="bg-surface-container p-6 rounded-2xl space-y-4 border border-white/5">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background flex items-center justify-center text-primary font-bold text-xs">DS</div>
+<span class="font-bold">DeepSeek R1</span>
+</div>
+<span class="text-[10px] text-primary font-bold px-2 py-1 bg-primary/10 rounded uppercase" id="deepseek-status">Connected</span>
+</div>
+<div class="relative">
+<input id="deepseek-key" class="w-full bg-background border-none rounded-xl p-3 text-sm font-mono text-on-surface-variant" type="password" value="sk-d0b1a0acd16942ca8a87ef4f8edef900"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-sm cursor-pointer" onclick="toggleKeyVisibility('deepseek-key')">visibility_off</span>
+</div>
+</div>
+<!-- Fal.ai -->
+<div class="bg-surface-container p-6 rounded-2xl space-y-4 border border-white/5">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background flex items-center justify-center text-blue-400 font-bold text-xs">FL</div>
+<span class="font-bold">Fal.ai Z-Image Turbo</span>
+</div>
+<span class="text-[10px] text-primary font-bold px-2 py-1 bg-primary/10 rounded uppercase" id="fal-status">Connected</span>
+</div>
+<input id="fal-key" class="w-full bg-background border-none rounded-xl p-3 text-sm font-mono text-on-surface-variant" type="password" value="1a1a3307-69ed-4c73-9cd4-16676d9d5476:1cc4f7cd1b8947f4cacbb71a366821d9"/>
+</div>
+<!-- ElevenLabs -->
+<div class="bg-surface-container p-6 rounded-2xl space-y-4 border border-white/5">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background flex items-center justify-center text-green-400 font-bold text-xs">11</div>
+<span class="font-bold">Eleven Labs</span>
+</div>
+<span class="text-[10px] text-primary font-bold px-2 py-1 bg-primary/10 rounded uppercase" id="eleven-status">Connected</span>
+</div>
+<input id="eleven-key" class="w-full bg-background border-none rounded-xl p-3 text-sm font-mono text-on-surface-variant" type="password" value="sk_848fc7f4153fd3ff0268a29ccff22714e3d7590e314e3a7f"/>
+</div>
+</div>
+<p class="text-center text-[10px] text-on-surface-variant/40 max-w-[200px] mx-auto uppercase tracking-tighter">
+                Keys are stored locally within the obsidian monolith.
+            </p>
+</section>
+</main>
+
+<!-- Global Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-background/80 backdrop-blur-xl z-50 rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(255,45,117,0.1)] border-t border-white/5">
+<button class="nav-item flex flex-col items-center justify-center text-primary bg-surface-container-high rounded-full px-6 py-2 transition-all" id="nav-chat" onclick="showPage('chat')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forum</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">Chat</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-forge" onclick="showPage('forge')">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">Forge</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-circuit" onclick="showPage('circuit')">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">Circuit</span>
+</button>
+<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-api" onclick="showPage('api')">
+<span class="material-symbols-outlined">api</span>
+<span class="font-headline text-[10px] font-bold mt-1 uppercase">API</span>
+</button>
+</nav>
+
+<script>
+/**
+ * API Configuration
+ */
+const API_CONFIG = {
+    deepseek: {
+        url: 'https://api.deepseek.com/chat/completions',
+        model: 'deepseek-reasoner'
+    },
+    fal: {
+        model: 'fal-ai/z-image/turbo' // Z-Image Turbo - super fast generation
+    },
+    elevenlabs: {
+        url: 'https://api.elevenlabs.io/v1/text-to-speech'
+    }
+};
+
+// Chat history
+let chatHistory = [];
+
+// Character storage
+let characters = JSON.parse(localStorage.getItem('blazebot_characters') || '[]');
+let currentCharacter = {};
+
+/**
+ * Get API Keys
+ */
+function getAPIKeys() {
+    return {
+        deepseek: document.getElementById('deepseek-key').value,
+        fal: document.getElementById('fal-key').value,
+        elevenlabs: document.getElementById('eleven-key').value
+    };
+}
+
+/**
+ * DeepSeek Chat API
+ */
+async function sendChatMessage(message, includeImage = false) {
+    const keys = getAPIKeys();
+    
+    chatHistory.push({
+        role: 'user',
+        content: message
+    });
+    
+    // Add user message to UI
+    addMessageToChat('user', message);
+    
+    // Add loading indicator
+    const loadingId = addLoadingIndicator();
+    
+    try {
+        const response = await fetch(API_CONFIG.deepseek.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keys.deepseek}`
+            },
+            body: JSON.stringify({
+                model: API_CONFIG.deepseek.model,
+                messages: [
+                    {role: 'system', content: 'You are a helpful AI assistant. Be concise and creative.'},
+                    ...chatHistory
+                ],
+                stream: false,
+                temperature: 0.7
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`DeepSeek API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const aiMessage = data.choices[0].message.content;
+        
+        chatHistory.push({
+            role: 'assistant',
+            content: aiMessage
+        });
+        
+        removeLoadingIndicator(loadingId);
+        
+        // If image generation requested
+        if (includeImage) {
+            addMessageToChat('assistant', aiMessage);
+            const imageLoadingId = addLoadingIndicator('Generating image...');
+            
+            try {
+                const imageUrl = await generateImage(message);
+                removeLoadingIndicator(imageLoadingId);
+                addMessageToChat('assistant', '', imageUrl);
+            } catch (error) {
+                removeLoadingIndicator(imageLoadingId);
+                console.error('Image generation error:', error);
+            }
+        } else {
+            addMessageToChat('assistant', aiMessage);
+        }
+        
+    } catch (error) {
+        removeLoadingIndicator(loadingId);
+        addMessageToChat('assistant', `Error: ${error.message}`);
+        console.error('Chat error:', error);
+    }
+}
+
+/**
+ * Fal.ai Z-Image Turbo Generation using REST API
+ */
+async function generateImage(prompt) {
+    const keys = getAPIKeys();
+    
+    try {
+        console.log('Generating image with Z-Image Turbo:', prompt);
+        
+        const response = await fetch('https://fal.run/fal-ai/z-image/turbo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Key ${keys.fal}`
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                image_size: "landscape_16_9",
+                num_inference_steps: 8,
+                num_images: 1,
+                enable_safety_checker: false
+            })
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Fal.ai API error response:', errorText);
+            console.error('Status:', response.status);
+            console.error('Headers:', response.headers);
+            alert(`Image generation failed: ${response.status} - ${errorText}`);
+            throw new Error(`Fal.ai error: ${response.status} - ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Fal.ai response:', data);
+        
+        if (data.images && data.images.length > 0) {
+            return data.images[0].url;
+        } else {
+            throw new Error('No images returned from Fal.ai');
+        }
+    } catch (error) {
+        console.error('Image generation error:', error);
+        throw error;
+    }
+}
+
+/**
+ * ElevenLabs Text-to-Speech
+ */
+async function generateVoice(text, voiceId) {
+    const keys = getAPIKeys();
+    
+    try {
+        const response = await fetch(`${API_CONFIG.elevenlabs.url}/${voiceId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'xi-api-key': keys.elevenlabs
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: "eleven_turbo_v2_5",
+                voice_settings: {
+                    stability: 0.5,
+                    similarity_boost: 0.75
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`ElevenLabs API error: ${response.status}`);
+        }
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Play audio
+        const audio = new Audio(audioUrl);
+        audio.play();
+        
+        return audioUrl;
+    } catch (error) {
+        console.error('ElevenLabs error:', error);
+        throw error;
+    }
+}
+
+/**
+ * UI Helper Functions
+ */
+function addMessageToChat(role, text, imageUrl = null) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    
+    if (role === 'user') {
+        messageDiv.className = 'flex flex-col items-end max-w-[85%] self-end';
+        messageDiv.innerHTML = `
+            <div class="bg-primary text-white rounded-2xl rounded-tr-none p-4 shadow-lg shadow-primary/10">
+                <p class="font-medium">${text}</p>
+            </div>
+        `;
+    } else {
+        messageDiv.className = 'flex flex-col items-start max-w-[95%]';
+        
+        if (imageUrl) {
+            messageDiv.innerHTML = `
+                <div class="bg-surface-container rounded-2xl rounded-tl-none overflow-hidden p-2 space-y-3 border border-white/5">
+                    <img alt="Generated image" class="w-full aspect-video object-cover rounded-xl" src="${imageUrl}"/>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
+                    <p class="text-on-surface-variant leading-relaxed">${text}</p>
+                </div>
+            `;
+        }
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function addLoadingIndicator(message = 'Thinking...') {
+    const chatMessages = document.getElementById('chat-messages');
+    const loadingDiv = document.createElement('div');
+    const loadingId = 'loading-' + Date.now();
+    loadingDiv.id = loadingId;
+    loadingDiv.className = 'flex flex-col items-start max-w-[85%]';
+    loadingDiv.innerHTML = `
+        <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
+            <p class="text-on-surface-variant leading-relaxed loading-pulse">${message}</p>
+        </div>
+    `;
+    chatMessages.appendChild(loadingDiv);
+    loadingDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    return loadingId;
+}
+
+function removeLoadingIndicator(loadingId) {
+    const loadingDiv = document.getElementById(loadingId);
+    if (loadingDiv) {
+        loadingDiv.remove();
+    }
+}
+
+/**
+ * Character Creation
+ */
+async function generateCharacterImage() {
+    const prompt = document.getElementById('char-visual-prompt').value;
+    const style = document.querySelector('.style-option.selected').dataset.style;
+    
+    const fullPrompt = `${style} style, character portrait, ${prompt}`;
+    
+    const btn = document.getElementById('generate-char-image-btn');
+    btn.textContent = 'GENERATING...';
+    btn.disabled = true;
+    
+    try {
+        const imageUrl = await generateImage(fullPrompt);
+        currentCharacter.imageUrl = imageUrl;
+        
+        document.getElementById('char-image-preview').classList.remove('hidden');
+        document.getElementById('char-generated-image').src = imageUrl;
+        
+        btn.textContent = 'REGENERATE IMAGE';
+        btn.disabled = false;
+    } catch (error) {
+        alert('Image generation failed: ' + error.message);
+        btn.textContent = 'GENERATE IMAGE';
+        btn.disabled = false;
+    }
+}
+
+async function createCharacter() {
+    const name = document.getElementById('char-name').value;
+    const gender = document.querySelector('.gender-option.selected')?.dataset.gender;
+    const intro = document.getElementById('char-intro').value;
+    const visualPrompt = document.getElementById('char-visual-prompt').value;
+    const style = document.querySelector('.style-option.selected').dataset.style;
+    const voiceId = document.querySelector('.voice-option.selected')?.dataset.voice;
+    const stability = document.getElementById('stability-slider').value;
+    const clarity = document.getElementById('clarity-slider').value;
+    
+    if (!name || !gender || !intro || !voiceId) {
+        alert('Please complete all required fields');
+        return;
+    }
+    
+    const character = {
+        id: Date.now(),
+        name,
+        gender,
+        intro,
+        visualPrompt,
+        style,
+        imageUrl: currentCharacter.imageUrl || '',
+        voiceId,
+        voiceSettings: {
+            stability: stability / 100,
+            clarity: clarity / 100
+        }
+    };
+    
+    characters.push(character);
+    localStorage.setItem('blazebot_characters', JSON.stringify(characters));
+    
+    // Reset form
+    document.getElementById('char-name').value = '';
+    document.getElementById('char-intro').value = '';
+    document.getElementById('char-visual-prompt').value = '';
+    document.getElementById('char-image-preview').classList.add('hidden');
+    currentCharacter = {};
+    
+    alert(`Character "${name}" created successfully!`);
+    showPage('circuit');
+    renderCharacters();
+}
+
+function renderCharacters() {
+    const grid = document.getElementById('character-grid');
+    const count = document.getElementById('circuit-count');
+    
+    count.textContent = `${characters.length}/5 UNITS ONLINE`;
+    
+    if (characters.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-2 text-center text-on-surface-variant py-12">
+                <p>No characters created yet. Visit the Forge to create your first companion.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = characters.map(char => `
+        <div class="bg-surface-container rounded-2xl overflow-hidden border border-white/5 relative h-48">
+            ${char.imageUrl ? `<img alt="${char.name}" class="w-full h-full object-cover grayscale brightness-50" src="${char.imageUrl}"/>` : ''}
+            <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4">
+                <h3 class="font-bold text-lg">${char.name}</h3>
+                <p class="text-[10px] tracking-widest text-primary uppercase">${char.gender}</p>
+            </div>
+            <div class="absolute top-4 right-4 bg-primary w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_#ff2d75]"></div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Voice Preview
+ */
+async function playVoicePreview(voiceId, text) {
+    try {
+        await generateVoice(text, voiceId);
+    } catch (error) {
+        alert('Voice preview failed: ' + error.message);
+    }
+}
+
+/**
+ * Event Listeners
+ */
+document.getElementById('send-btn').addEventListener('click', () => {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (message) {
+        sendChatMessage(message, false);
+        input.value = '';
+    }
+});
+
+document.getElementById('image-gen-btn').addEventListener('click', () => {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (message) {
+        sendChatMessage(message, true);
+        input.value = '';
+    }
+});
+
+document.getElementById('chat-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('send-btn').click();
+    }
+});
+
+/**
+ * Robust SPA Router
+ */
+const AppRouter = {
+    currentPage: 'chat',
+    pages: ['chat', 'forge', 'circuit', 'api'],
+
+    init() {
+        this.showPage(this.currentPage);
+        renderCharacters();
+    },
+
+    showPage(pageId) {
+        if (!this.pages.includes(pageId)) return;
+        this.currentPage = pageId;
+
+        document.querySelectorAll('.page-transition').forEach(page => {
+            page.classList.remove('active');
+        });
+
+        const targetPage = document.getElementById('page-' + pageId);
+        if (targetPage) targetPage.classList.add('active');
+
+        this.updateNav(pageId);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    updateNav(activeId) {
+        document.querySelectorAll('.nav-item').forEach(nav => {
+            nav.classList.remove('text-primary', 'bg-surface-container-high');
+            nav.classList.add('text-on-surface-variant');
+            const icon = nav.querySelector('.material-symbols-outlined');
+            if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+        });
+
+        const activeNav = document.getElementById('nav-' + activeId);
+        if (activeNav) {
+            activeNav.classList.remove('text-on-surface-variant');
+            activeNav.classList.add('text-primary', 'bg-surface-container-high');
+            const activeIcon = activeNav.querySelector('.material-symbols-outlined');
+            if (activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
+        }
+    }
+};
+
+function showPage(pageId) {
+    AppRouter.showPage(pageId);
+}
+
+/**
+ * Character Forge Step Manager
+ */
+function nextForgeStep(step) {
+    document.querySelectorAll('.forge-step').forEach(s => s.classList.add('hidden'));
+    
+    const targetStep = document.getElementById('forge-step-' + step);
+    if (targetStep) targetStep.classList.remove('hidden');
+
+    for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById('forge-dot-' + i);
+        if (dot) {
+            if (i <= step) {
+                dot.classList.remove('bg-surface-container');
+                dot.classList.add('bg-primary');
+            } else {
+                dot.classList.remove('bg-primary');
+                dot.classList.add('bg-surface-container');
+            }
+        }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Visual Selection Handlers
+ */
+function selectStyle(element) {
+    document.querySelectorAll('.style-option').forEach(opt => {
+        opt.classList.remove('selected', 'border-primary/40');
+        opt.classList.add('border-white/5', 'opacity-50');
+    });
+    element.classList.add('selected', 'border-primary/40');
+    element.classList.remove('border-white/5', 'opacity-50');
+}
+
+function selectGender(element) {
+    document.querySelectorAll('.gender-option').forEach(opt => {
+        opt.classList.remove('border-primary/40');
+        opt.classList.add('border-white/5', 'opacity-50');
+        opt.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 0";
+    });
+    element.classList.add('border-primary/40');
+    element.classList.remove('border-white/5', 'opacity-50');
+    element.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
+}
+
+function selectVoice(element) {
+    document.querySelectorAll('.voice-option').forEach(opt => {
+        opt.classList.remove('border-primary/40');
+        opt.classList.add('border-white/5', 'opacity-50');
+    });
+    element.classList.add('border-primary/40');
+    element.classList.remove('border-white/5', 'opacity-50');
+}
+
+function toggleKeyVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+// Initialize on load
+AppRouter.init();
+</script>
+</body>
+</html>
