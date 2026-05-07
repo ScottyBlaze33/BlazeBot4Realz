@@ -277,21 +277,16 @@
 </div>
 <div class="space-y-2">
 <label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Aspect Ratio</label>
-<div class="grid grid-cols-3 gap-3">
-<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-ratio="portrait_9_16" onclick="selectRatio(this)">
+<div class="grid grid-cols-2 gap-3">
+<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-ratio="portrait_16_9" onclick="selectRatio(this)">
 <div class="w-8 h-12 bg-primary/20 rounded border-2 border-primary/40 mb-2"></div>
 <span class="text-[10px] font-bold">9:16</span>
 <span class="text-[8px] text-on-surface-variant">Portrait</span>
 </div>
-<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-ratio="square" onclick="selectRatio(this)">
+<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-primary/40 selected cursor-pointer transition-all" data-ratio="square_hd" onclick="selectRatio(this)">
 <div class="w-10 h-10 bg-primary/20 rounded border-2 border-primary/40 mb-2"></div>
 <span class="text-[10px] font-bold">1:1</span>
 <span class="text-[8px] text-on-surface-variant">Square</span>
-</div>
-<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-primary/40 selected cursor-pointer transition-all" data-ratio="landscape_16_9" onclick="selectRatio(this)">
-<div class="w-12 h-8 bg-primary/20 rounded border-2 border-primary/40 mb-2"></div>
-<span class="text-[10px] font-bold">16:9</span>
-<span class="text-[8px] text-on-surface-variant">Landscape</span>
 </div>
 </div>
 </div>
@@ -606,7 +601,7 @@ async function sendChatMessage(message, includeImage = false) {
 /**
  * Fal.ai Z-Image Turbo Generation using REST API
  */
-async function generateImage(prompt, aspectRatio = 'landscape_16_9') {
+async function generateImage(prompt, aspectRatio = 'square_hd') {
     const keys = getAPIKeys();
     
     try {
@@ -756,7 +751,7 @@ function removeLoadingIndicator(loadingId) {
 async function generateCharacterImage() {
     const prompt = document.getElementById('char-visual-prompt').value;
     const style = document.querySelector('.style-option.selected').dataset.style;
-    const ratio = document.querySelector('.ratio-option.selected')?.dataset.ratio || 'landscape_16_9';
+    const ratio = document.querySelector('.ratio-option.selected')?.dataset.ratio || 'square_hd';
     
     const fullPrompt = `${style} style, character portrait, ${prompt}`;
     
