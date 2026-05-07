@@ -466,8 +466,12 @@ let selectedGroupBots = [];
  * Define showPage as global function immediately
  */
 function showPage(pageId) {
+    console.log('showPage called with:', pageId);
+    alert('Button clicked! Page: ' + pageId);
     if (window.AppRouter) {
         window.AppRouter.showPage(pageId);
+    } else {
+        alert('AppRouter not ready yet!');
     }
 }
 
