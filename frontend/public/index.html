@@ -467,12 +467,37 @@ let selectedGroupBots = [];
  */
 function showPage(pageId) {
     console.log('showPage called with:', pageId);
-    alert('Button clicked! Page: ' + pageId);
-    if (window.AppRouter) {
-        window.AppRouter.showPage(pageId);
-    } else {
-        alert('AppRouter not ready yet!');
+    
+    // Hide all pages
+    document.querySelectorAll('.page-transition').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show target page
+    const targetPage = document.getElementById('page-' + pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
     }
+    
+    // Update navigation active state
+    document.querySelectorAll('.nav-item').forEach(nav => {
+        nav.style.opacity = '0.5';
+        nav.style.transform = 'scale(0.9)';
+    });
+    
+    const activeNav = document.getElementById('nav-' + pageId);
+    if (activeNav) {
+        activeNav.style.opacity = '1';
+        activeNav.style.transform = 'scale(1)';
+    }
+    
+    // Populate bot selector if going to collective
+    if (pageId === 'collective' && typeof populateBotSelector === 'function') {
+        populateBotSelector();
+    }
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /**
