@@ -124,36 +124,95 @@
 <main class="pt-20 pb-32 px-4 max-w-2xl mx-auto min-h-screen relative">
 <!-- Green Flame Pulse Decoration -->
 <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-green-500/10 via-primary/5 to-transparent blur-[120px] -z-10 pointer-events-none circuit-glow"></div>
-<!-- 1. COLLECTIVE - GROUP CHAT PAGE -->
-<section class="page-transition active space-y-6" id="page-chat">
-<div class="text-center mb-6">
-<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Collective</h2>
-<p class="text-on-surface-variant text-xs">Group Chat Arena</p>
+<!-- 1. BLAZEBOT NAVIGATION BOT - MAIN PAGE -->
+<section class="page-transition active space-y-6" id="page-blazebot">
+<div class="text-center mb-8">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/s4ci5z0c_1000315385.png" alt="Blazebot" class="w-full max-w-md mx-auto rounded-2xl mb-6"/>
+<h2 class="text-3xl font-black tracking-tight text-white uppercase mb-2">Welcome to BLAZEBOT</h2>
+<p class="text-primary text-sm font-bold">Your AI Navigation Assistant</p>
 </div>
-<div class="flex flex-col gap-6" id="chat-messages">
-<!-- Initial welcome message -->
-<div class="flex flex-col items-start max-w-[85%]">
+<div class="flex flex-col gap-6" id="nav-bot-messages">
+<div class="flex flex-col items-start max-w-[95%]">
 <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
-<p class="text-on-surface-variant leading-relaxed">🔥 Welcome to The Collective! Chat with all your AI bots together here.</p>
+<p class="text-on-surface-variant leading-relaxed">🔥 Hey there! I'm BLAZEBOT, your navigation assistant. I can help you:</p>
+<ul class="text-on-surface-variant text-sm mt-2 ml-4 space-y-1">
+<li>• Navigate the app</li>
+<li>• Build amazing prompts</li>
+<li>• Create characters</li>
+<li>• Generate images</li>
+<li>• Set up group chats</li>
+</ul>
+<p class="text-on-surface-variant mt-3">What would you like to do?</p>
 </div>
-<span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">SYSTEM ONLINE</span>
+<span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">BLAZEBOT ONLINE</span>
 </div>
 </div>
-<!-- Sticky Chat Input -->
 <div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-40">
-<div class="bg-surface border border-outline/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
-<button id="image-gen-btn" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
-<span class="material-symbols-outlined">image_search</span>
-</button>
-<input id="chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Talk to the collective..." type="text"/>
-<button id="send-btn" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<div class="bg-surface border border-primary/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
+<input id="nav-bot-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Ask BLAZEBOT anything..." type="text"/>
+<button id="nav-bot-send" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
 </div>
 </section>
 
-<!-- 2. CREATOR - CHARACTER FORGE PAGE -->
+<!-- 2. COLLECTIVE - GROUP CHAT PAGE -->
+<section class="page-transition space-y-6" id="page-collective">
+<div class="text-center mb-4">
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Collective</h2>
+<p class="text-on-surface-variant text-xs">Group Chat Arena</p>
+</div>
+
+<!-- Group Chat Setup -->
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Group Chat Name</label>
+<input id="group-name" class="w-full bg-surface-container border-none rounded-xl p-3 text-white focus:ring-1 focus:ring-primary/40" placeholder="Name your group chat..." type="text"/>
+</div>
+
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Context & Scenario</label>
+<textarea id="group-context" class="w-full bg-surface-container border-none rounded-xl p-3 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="Describe the scenario, relationships, roleplay setup..." rows="3"></textarea>
+</div>
+
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Your Character</label>
+<select id="your-character" class="w-full bg-surface-container border-none rounded-xl p-3 text-white focus:ring-1 focus:ring-primary/40">
+<option value="">Select your character...</option>
+</select>
+</div>
+
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Select Bots (up to 5)</label>
+<div class="grid grid-cols-1 gap-2" id="bot-selector-list">
+<p class="text-on-surface-variant text-sm text-center py-4">Create some bots first in the Creator!</p>
+</div>
+</div>
+
+<button id="start-group-chat-btn" class="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-all">START GROUP CHAT</button>
+</div>
+
+<!-- Group Chat Interface (hidden by default) -->
+<div id="group-chat-interface" class="hidden">
+<div class="flex flex-col gap-4" id="group-chat-messages"></div>
+<!-- Bot Selection Bar at bottom -->
+<div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 z-40">
+<div class="bg-surface-container rounded-2xl p-3 mb-3 border border-primary/20">
+<p class="text-[10px] text-primary font-bold mb-2 uppercase tracking-wider">Tap a bot to make them respond:</p>
+<div class="flex gap-2 overflow-x-auto" id="group-bot-avatars"></div>
+</div>
+<div class="bg-surface border border-outline/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
+<input id="group-chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Your message..." type="text"/>
+<button id="group-send-btn" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 3. CREATOR - CHARACTER FORGE PAGE -->
 <section class="page-transition space-y-8" id="page-forge">
 <div class="space-y-4">
 <div class="flex justify-between items-center">
@@ -306,22 +365,8 @@
 </div>
 </section>
 
-<!-- 4. BOT.ME PERSONAS PAGE -->
-<section class="page-transition space-y-8" id="page-botme">
-<div class="text-center space-y-2">
-<span class="material-symbols-outlined text-primary text-4xl">psychology</span>
-<h2 class="text-2xl font-black tracking-tight text-white uppercase">Bot.ME</h2>
-<p class="text-on-surface-variant text-xs">Your AI Personas & Identities</p>
-</div>
-<div class="grid grid-cols-1 gap-4">
-<div class="col-span-1 text-center text-on-surface-variant py-12">
-<p>Coming soon: Create and manage your AI personas here!</p>
-</div>
-</div>
-</section>
-
-<!-- 5. API / SETTINGS PAGE -->
-<section class="page-transition space-y-8" id="page-api">
+<!-- 4. YOUR BOTS - BOT STORAGE PAGE -->
+<section class="page-transition space-y-8" id="page-circuit">
 <div class="text-center space-y-2">
 <span class="material-symbols-outlined text-primary text-4xl">hub</span>
 <h2 class="text-2xl font-black tracking-tight text-white uppercase">Configuration Hub</h2>
@@ -373,8 +418,8 @@
 
 <!-- Global Bottom Navigation -->
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-6 pt-3 bg-background/90 backdrop-blur-xl z-50 border-t border-white/5">
-<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-chat" onclick="showPage('chat')">
-<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/xm8gkh17_1000315392.png" alt="Collective" class="w-16 h-16 object-contain"/>
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-blazebot" onclick="showPage('blazebot')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/hua89e8k_1000315388.png" alt="Blazebot" class="w-16 h-16 object-contain"/>
 </button>
 <button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-forge" onclick="showPage('forge')">
 <img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/p76b2dmx_1000315389.png" alt="Creator" class="w-16 h-16 object-contain"/>
@@ -382,8 +427,8 @@
 <button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-circuit" onclick="showPage('circuit')">
 <img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/7984vxft_1000315390.png" alt="Your Bots" class="w-16 h-16 object-contain"/>
 </button>
-<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-botme" onclick="showPage('botme')">
-<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/rqs7ufap_1000315391.png" alt="Bot.ME" class="w-16 h-16 object-contain"/>
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-collective" onclick="showPage('collective')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/xm8gkh17_1000315392.png" alt="Collective" class="w-16 h-16 object-contain"/>
 </button>
 <button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-api" onclick="showPage('api')">
 <img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/bc7yv5n2_1000315393.png" alt="API Keys" class="w-16 h-16 object-contain"/>
@@ -759,9 +804,16 @@ async function playVoicePreview(voiceId, text) {
     }
 }
 
+// Initialize on load
+AppRouter.init();
+
 /**
- * Event Listeners
+ * Event Listeners - wrap in DOMContentLoaded
  */
+document.addEventListener('DOMContentLoaded', () => {
+    
+// Chat event listeners (if they exist on the page)
+if (document.getElementById('send-btn')) {
 document.getElementById('send-btn').addEventListener('click', () => {
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
@@ -770,7 +822,9 @@ document.getElementById('send-btn').addEventListener('click', () => {
         input.value = '';
     }
 });
+}
 
+if (document.getElementById('image-gen-btn')) {
 document.getElementById('image-gen-btn').addEventListener('click', () => {
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
@@ -779,19 +833,235 @@ document.getElementById('image-gen-btn').addEventListener('click', () => {
         input.value = '';
     }
 });
+}
 
+if (document.getElementById('chat-input')) {
 document.getElementById('chat-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         document.getElementById('send-btn').click();
     }
 });
+}
+
+// Navigation Bot Event Listeners
+if (document.getElementById('nav-bot-send')) {
+document.getElementById('nav-bot-send').addEventListener('click', () => {
+    const input = document.getElementById('nav-bot-input');
+    const message = input.value.trim();
+    if (message) {
+        sendNavBotMessage(message);
+        input.value = '';
+    }
+});
+}
+
+if (document.getElementById('nav-bot-input')) {
+document.getElementById('nav-bot-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('nav-bot-send').click();
+    }
+});
+}
+
+// Group Chat Setup
+if (document.getElementById('start-group-chat-btn')) {
+document.getElementById('start-group-chat-btn').addEventListener('click', () => {
+    startGroupChat();
+});
+}
+
+}); // End DOMContentLoaded
+
+/**
+ * Navigation Bot Chat
+ */
+async function sendNavBotMessage(message) {
+    const navBotMessages = document.getElementById('nav-bot-messages');
+    
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'flex flex-col items-end max-w-[85%] self-end ml-auto';
+    userMsg.innerHTML = `
+        <div class="bg-primary text-white rounded-2xl rounded-tr-none p-4 shadow-lg shadow-primary/10">
+            <p class="font-medium">${message}</p>
+        </div>
+    `;
+    navBotMessages.appendChild(userMsg);
+    
+    // Add loading
+    const loadingId = 'nav-loading-' + Date.now();
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = loadingId;
+    loadingDiv.className = 'flex flex-col items-start max-w-[95%]';
+    loadingDiv.innerHTML = `
+        <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
+            <p class="text-on-surface-variant leading-relaxed loading-pulse">BLAZEBOT thinking...</p>
+        </div>
+    `;
+    navBotMessages.appendChild(loadingDiv);
+    loadingDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    // Call DeepSeek
+    try {
+        const keys = getAPIKeys();
+        const response = await fetch(API_CONFIG.deepseek.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keys.deepseek}`
+            },
+            body: JSON.stringify({
+                model: API_CONFIG.deepseek.model,
+                messages: [
+                    {role: 'system', content: 'You are BLAZEBOT, a helpful navigation assistant for an AI character creation app. Help users navigate, build prompts, create characters, and generate images. Be friendly and concise.'},
+                    {role: 'user', content: message}
+                ],
+                stream: false,
+                temperature: 0.7
+            })
+        });
+        
+        const data = await response.json();
+        const aiMessage = data.choices[0].message.content;
+        
+        document.getElementById(loadingId).remove();
+        
+        const botMsg = document.createElement('div');
+        botMsg.className = 'flex flex-col items-start max-w-[95%]';
+        botMsg.innerHTML = `
+            <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
+                <p class="text-on-surface-variant leading-relaxed">${aiMessage}</p>
+            </div>
+        `;
+        navBotMessages.appendChild(botMsg);
+        botMsg.scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        document.getElementById(loadingId).remove();
+        console.error('Navigation bot error:', error);
+    }
+}
+
+/**
+ * Group Chat Functions
+ */
+let selectedGroupBots = [];
+
+function populateBotSelector() {
+    const botList = document.getElementById('bot-selector-list');
+    const yourCharSelect = document.getElementById('your-character');
+    
+    if (characters.length === 0) {
+        botList.innerHTML = '<p class="text-on-surface-variant text-sm text-center py-4">Create some bots first in the Creator!</p>';
+        return;
+    }
+    
+    // Populate your character dropdown
+    yourCharSelect.innerHTML = '<option value="">Select your character...</option>' + 
+        characters.map(char => `<option value="${char.id}">${char.name}</option>`).join('');
+    
+    // Populate bot selector
+    botList.innerHTML = characters.map(char => `
+        <div class="bot-select-item bg-surface-container p-3 rounded-xl flex items-center gap-3 cursor-pointer border border-white/5 hover:border-primary/40 transition-all" data-bot-id="${char.id}">
+            ${char.imageUrl ? `<img src="${char.imageUrl}" alt="${char.name}" class="w-12 h-12 rounded-full object-cover"/>` : '<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">?</div>'}
+            <div class="flex-1">
+                <p class="font-bold text-sm">${char.name}</p>
+                <p class="text-[10px] text-on-surface-variant">${char.gender}</p>
+            </div>
+            <input type="checkbox" class="bot-checkbox accent-primary w-5 h-5" data-bot-id="${char.id}"/>
+        </div>
+    `).join('');
+    
+    // Add checkbox listeners
+    document.querySelectorAll('.bot-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const botId = parseInt(e.target.dataset.botId);
+            if (e.target.checked) {
+                if (selectedGroupBots.length < 5) {
+                    selectedGroupBots.push(botId);
+                } else {
+                    e.target.checked = false;
+                    alert('Maximum 5 bots allowed in group chat!');
+                }
+            } else {
+                selectedGroupBots = selectedGroupBots.filter(id => id !== botId);
+            }
+        });
+    });
+}
+
+function startGroupChat() {
+    const groupName = document.getElementById('group-name').value;
+    const context = document.getElementById('group-context').value;
+    const yourCharId = document.getElementById('your-character').value;
+    
+    if (!groupName || !context || !yourCharId || selectedGroupBots.length === 0) {
+        alert('Please fill all fields and select at least one bot!');
+        return;
+    }
+    
+    // Hide setup, show chat
+    document.querySelector('#page-collective > .space-y-4').classList.add('hidden');
+    document.getElementById('group-chat-interface').classList.remove('hidden');
+    
+    // Setup bot avatars
+    const avatarContainer = document.getElementById('group-bot-avatars');
+    avatarContainer.innerHTML = selectedGroupBots.map(botId => {
+        const bot = characters.find(c => c.id === botId);
+        return `
+            <button class="group-bot-avatar flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 transition-all" data-bot-id="${botId}">
+                ${bot.imageUrl ? `<img src="${bot.imageUrl}" alt="${bot.name}" class="w-12 h-12 rounded-full object-cover border-2 border-primary/40"/>` : '<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">?</div>'}
+                <span class="text-[8px] font-bold">${bot.name}</span>
+            </button>
+        `;
+    }).join('');
+    
+    // Add welcome message
+    const chatMessages = document.getElementById('group-chat-messages');
+    chatMessages.innerHTML = `
+        <div class="bg-surface-container rounded-xl p-4 border border-primary/20 text-center">
+            <h3 class="font-bold text-primary mb-2">${groupName}</h3>
+            <p class="text-sm text-on-surface-variant">${context}</p>
+        </div>
+    `;
+    
+    // Bot avatar click listeners
+    document.querySelectorAll('.group-bot-avatar').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const botId = parseInt(btn.dataset.botId);
+            makeSelectedBotRespond(botId);
+        });
+    });
+}
+
+async function makeSelectedBotRespond(botId) {
+    const bot = characters.find(c => c.id === botId);
+    const chatMessages = document.getElementById('group-chat-messages');
+    
+    // Add loading
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'flex items-start gap-2';
+    loadingDiv.innerHTML = `
+        ${bot.imageUrl ? `<img src="${bot.imageUrl}" class="w-10 h-10 rounded-full"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20"></div>'}
+        <div class="bg-surface-container rounded-2xl p-3 max-w-[80%]">
+            <p class="text-[10px] text-primary font-bold mb-1">${bot.name}</p>
+            <p class="text-sm loading-pulse">Thinking...</p>
+        </div>
+    `;
+    chatMessages.appendChild(loadingDiv);
+    loadingDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    // Call API (simplified for now)
+    setTimeout(() => {
+        loadingDiv.querySelector('.loading-pulse').textContent = `Hey! I'm ${bot.name}. This is a group chat response!`;
+    }, 1000);
+}
 
 /**
  * Robust SPA Router
  */
 const AppRouter = {
-    currentPage: 'chat',
-    pages: ['chat', 'forge', 'circuit', 'botme', 'api'],
+    currentPage: 'blazebot',
+    pages: ['blazebot', 'forge', 'circuit', 'collective', 'api'],
 
     init() {
         this.showPage(this.currentPage);
@@ -810,6 +1080,12 @@ const AppRouter = {
         if (targetPage) targetPage.classList.add('active');
 
         this.updateNav(pageId);
+        
+        // Populate bot selector when visiting collective
+        if (pageId === 'collective') {
+            populateBotSelector();
+        }
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
@@ -900,9 +1176,6 @@ function toggleKeyVisibility(inputId) {
     const input = document.getElementById(inputId);
     input.type = input.type === 'password' ? 'text' : 'password';
 }
-
-// Initialize on load
-AppRouter.init();
 </script>
 </body>
 </html>
