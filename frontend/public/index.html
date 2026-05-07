@@ -459,6 +459,18 @@ let chatHistory = [];
 let characters = JSON.parse(localStorage.getItem('blazebot_characters') || '[]');
 let currentCharacter = {};
 
+// Group chat state
+let selectedGroupBots = [];
+
+/**
+ * Define showPage as global function immediately
+ */
+function showPage(pageId) {
+    if (window.AppRouter) {
+        window.AppRouter.showPage(pageId);
+    }
+}
+
 /**
  * Get API Keys
  */
@@ -944,8 +956,6 @@ async function sendNavBotMessage(message) {
 /**
  * Group Chat Functions
  */
-let selectedGroupBots = [];
-
 function populateBotSelector() {
     const botList = document.getElementById('bot-selector-list');
     const yourCharSelect = document.getElementById('your-character');
@@ -1103,10 +1113,6 @@ const AppRouter = {
     }
 };
 
-function showPage(pageId) {
-    AppRouter.showPage(pageId);
-}
-
 /**
  * Character Forge Step Manager
  */
@@ -1176,6 +1182,12 @@ function toggleKeyVisibility(inputId) {
     const input = document.getElementById(inputId);
     input.type = input.type === 'password' ? 'text' : 'password';
 }
+
+// Initialize after everything is loaded
+window.addEventListener('load', () => {
+    window.AppRouter = AppRouter;
+    AppRouter.init();
+});
 </script>
 </body>
 </html>
