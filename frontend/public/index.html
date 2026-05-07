@@ -149,8 +149,8 @@
 </div>
 <div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-40">
 <div class="bg-surface border border-primary/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
-<input id="nav-bot-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Ask BLAZEBOT anything..." type="text"/>
-<button id="nav-bot-send" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<input id="nav-bot-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Ask BLAZEBOT anything..." type="text" onkeypress="if(event.key==='Enter'){document.getElementById('nav-bot-send').click();}"/>
+<button id="nav-bot-send" onclick="handleNavBotSend()" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
@@ -498,6 +498,18 @@ function showPage(pageId) {
     
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Handle Navigation Bot Send - Global function
+ */
+function handleNavBotSend() {
+    const input = document.getElementById('nav-bot-input');
+    const message = input.value.trim();
+    if (message) {
+        sendNavBotMessage(message);
+        input.value = '';
+    }
 }
 
 /**
