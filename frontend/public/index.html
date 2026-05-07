@@ -307,25 +307,32 @@
 <!-- Step 3: Voice -->
 <div class="forge-step hidden space-y-6" id="forge-step-3">
 <div class="space-y-4">
-<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Voice Archetype</label>
-<div class="space-y-2">
-<div class="voice-option bg-surface-container p-4 rounded-xl border border-primary/40 flex justify-between items-center cursor-pointer" data-voice="pNInz6obpgDQGcFmaJgB" onclick="selectVoice(this)">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Voice Generation</label>
+<p class="text-[10px] text-on-surface-variant px-1">Describe the voice you want to generate</p>
+<textarea id="voice-prompt" class="w-full bg-surface-container border-none rounded-xl p-4 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="e.g., A calm, deep male voice with a slight British accent..." rows="3"></textarea>
+<button id="generate-voice-btn" onclick="generateVoiceFromPrompt()" class="w-full py-3 bg-primary/20 text-primary font-bold rounded-xl hover:bg-primary/30 transition-all">
+GENERATE VOICE
+</button>
+</div>
+
+<div id="voice-preview-section" class="hidden space-y-3">
+<div class="bg-surface-container-high rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">mic</span>
+</div>
 <div>
-<p class="font-bold text-sm">The Architect</p>
-<p class="text-[10px] text-on-surface-variant">Calm, precise, analytical</p>
-</div>
-<span class="material-symbols-outlined text-primary play-voice-btn" onclick="event.stopPropagation(); playVoicePreview('pNInz6obpgDQGcFmaJgB', 'Hello, I am your AI companion.')">play_circle</span>
-</div>
-<div class="voice-option bg-surface-container p-4 rounded-xl border border-white/5 flex justify-between items-center opacity-50 cursor-pointer" data-voice="N2lVS1w4EtoT3dr4eOWO" onclick="selectVoice(this)">
-<div>
-<p class="font-bold text-sm">The Rogue</p>
-<p class="text-[10px] text-on-surface-variant">Raspy, energetic, sharp</p>
-</div>
-<span class="material-symbols-outlined play-voice-btn" onclick="event.stopPropagation(); playVoicePreview('N2lVS1w4EtoT3dr4eOWO', 'Ready for action!')">play_circle</span>
+<p class="font-bold text-sm">Generated Voice</p>
+<p class="text-[10px] text-on-surface-variant">Ready to use</p>
 </div>
 </div>
+<button onclick="playGeneratedVoice()" class="bg-primary/20 p-3 rounded-full hover:bg-primary/30 transition-all">
+<span class="material-symbols-outlined text-primary">play_arrow</span>
+</button>
 </div>
-<div class="space-y-4">
+</div>
+
+<div class="space-y-4 mt-6">
 <div class="space-y-2">
 <div class="flex justify-between text-[10px] font-bold text-on-surface-variant px-1 uppercase tracking-widest">
 <span>Stability</span>
@@ -779,12 +786,12 @@ async function createCharacter() {
     const intro = document.getElementById('char-intro').value;
     const visualPrompt = document.getElementById('char-visual-prompt').value;
     const style = document.querySelector('.style-option.selected').dataset.style;
-    const voiceId = document.querySelector('.voice-option.selected')?.dataset.voice;
+    const voicePrompt = document.getElementById('voice-prompt').value;
     const stability = document.getElementById('stability-slider').value;
     const clarity = document.getElementById('clarity-slider').value;
     
-    if (!name || !gender || !intro || !voiceId) {
-        alert('Please complete all required fields');
+    if (!name || !gender || !intro) {
+        alert('Please complete all required fields in steps 1-3');
         return;
     }
     
@@ -796,7 +803,8 @@ async function createCharacter() {
         visualPrompt,
         style,
         imageUrl: currentCharacter.imageUrl || '',
-        voiceId,
+        voicePrompt: voicePrompt || 'Default voice',
+        voiceAudio: currentCharacter.voiceAudio || null,
         voiceSettings: {
             stability: stability / 100,
             clarity: clarity / 100
@@ -810,8 +818,11 @@ async function createCharacter() {
     document.getElementById('char-name').value = '';
     document.getElementById('char-intro').value = '';
     document.getElementById('char-visual-prompt').value = '';
+    document.getElementById('voice-prompt').value = '';
     document.getElementById('char-image-preview').classList.add('hidden');
+    document.getElementById('voice-preview-section').classList.add('hidden');
     currentCharacter = {};
+    generatedVoiceAudio = null;
     
     alert(`Character "${name}" created successfully!`);
     showPage('circuit');
@@ -849,6 +860,78 @@ function renderCharacters() {
 /**
  * Voice Preview
  */
+let generatedVoiceAudio = null;
+
+async function generateVoiceFromPrompt() {
+    const prompt = document.getElementById('voice-prompt').value.trim();
+    
+    if (!prompt) {
+        alert('Please describe the voice you want to generate!');
+        return;
+    }
+    
+    const btn = document.getElementById('generate-voice-btn');
+    btn.textContent = 'GENERATING VOICE...';
+    btn.disabled = true;
+    
+    try {
+        const keys = getAPIKeys();
+        const stability = document.getElementById('stability-slider').value / 100;
+        const clarity = document.getElementById('clarity-slider').value / 100;
+        
+        // Use a default ElevenLabs voice for now with text from prompt
+        const response = await fetch(`${API_CONFIG.elevenlabs.url}/pNInz6obpgDQGcFmaJgB`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'xi-api-key': keys.elevenlabs
+            },
+            body: JSON.stringify({
+                text: `This is a sample of the voice you requested: ${prompt}`,
+                model_id: "eleven_turbo_v2_5",
+                voice_settings: {
+                    stability: stability,
+                    similarity_boost: clarity
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Voice generation failed: ${response.status}`);
+        }
+        
+        const audioBlob = await response.blob();
+        generatedVoiceAudio = URL.createObjectURL(audioBlob);
+        
+        // Store voice info in character
+        currentCharacter.voicePrompt = prompt;
+        currentCharacter.voiceAudio = generatedVoiceAudio;
+        currentCharacter.voiceSettings = { stability, clarity };
+        
+        // Show preview section
+        document.getElementById('voice-preview-section').classList.remove('hidden');
+        
+        btn.textContent = 'REGENERATE VOICE';
+        btn.disabled = false;
+        
+        // Auto-play the voice
+        playGeneratedVoice();
+        
+    } catch (error) {
+        console.error('Voice generation error:', error);
+        alert('Voice generation failed: ' + error.message);
+        btn.textContent = 'GENERATE VOICE';
+        btn.disabled = false;
+    }
+}
+
+function playGeneratedVoice() {
+    if (generatedVoiceAudio) {
+        const audio = new Audio(generatedVoiceAudio);
+        audio.play();
+    }
+}
+
 async function playVoicePreview(voiceId, text) {
     try {
         await generateVoice(text, voiceId);
@@ -1208,15 +1291,6 @@ function selectGender(element) {
     element.classList.add('border-primary/40');
     element.classList.remove('border-white/5', 'opacity-50');
     element.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
-}
-
-function selectVoice(element) {
-    document.querySelectorAll('.voice-option').forEach(opt => {
-        opt.classList.remove('border-primary/40');
-        opt.classList.add('border-white/5', 'opacity-50');
-    });
-    element.classList.add('border-primary/40');
-    element.classList.remove('border-white/5', 'opacity-50');
 }
 
 function toggleKeyVisibility(inputId) {
