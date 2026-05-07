@@ -66,6 +66,10 @@
         .style-option.selected .material-symbols-outlined {
             font-variation-settings: 'FILL' 1;
         }
+        .ratio-option.selected {
+            border-color: #ff2d75 !important;
+            opacity: 1 !important;
+        }
         .loading-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -175,6 +179,26 @@
 <div class="style-option aspect-square bg-surface-container rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-style="comic" onclick="selectStyle(this)">
 <span class="material-symbols-outlined">auto_fix_high</span>
 <span class="text-[10px] mt-1">COMIC</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Aspect Ratio</label>
+<div class="grid grid-cols-3 gap-3">
+<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-ratio="portrait_9_16" onclick="selectRatio(this)">
+<div class="w-8 h-12 bg-primary/20 rounded border-2 border-primary/40 mb-2"></div>
+<span class="text-[10px] font-bold">9:16</span>
+<span class="text-[8px] text-on-surface-variant">Portrait</span>
+</div>
+<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-white/5 opacity-50 cursor-pointer transition-all" data-ratio="square" onclick="selectRatio(this)">
+<div class="w-10 h-10 bg-primary/20 rounded border-2 border-primary/40 mb-2"></div>
+<span class="text-[10px] font-bold">1:1</span>
+<span class="text-[8px] text-on-surface-variant">Square</span>
+</div>
+<div class="ratio-option bg-surface-container p-3 rounded-xl flex flex-col items-center justify-center border border-primary/40 selected cursor-pointer transition-all" data-ratio="landscape_16_9" onclick="selectRatio(this)">
+<div class="w-12 h-8 bg-primary/20 rounded border-2 border-primary/40 mb-2"></div>
+<span class="text-[10px] font-bold">16:9</span>
+<span class="text-[8px] text-on-surface-variant">Landscape</span>
 </div>
 </div>
 </div>
@@ -430,11 +454,11 @@ async function sendChatMessage(message, includeImage = false) {
 /**
  * Fal.ai Z-Image Turbo Generation using REST API
  */
-async function generateImage(prompt) {
+async function generateImage(prompt, aspectRatio = 'landscape_16_9') {
     const keys = getAPIKeys();
     
     try {
-        console.log('Generating image with Z-Image Turbo:', prompt);
+        console.log('Generating image with Z-Image Turbo:', prompt, 'Ratio:', aspectRatio);
         
         const response = await fetch('https://fal.run/fal-ai/z-image/turbo', {
             method: 'POST',
@@ -444,7 +468,7 @@ async function generateImage(prompt) {
             },
             body: JSON.stringify({
                 prompt: prompt,
-                image_size: "landscape_16_9",
+                image_size: aspectRatio,
                 num_inference_steps: 8,
                 num_images: 1,
                 enable_safety_checker: false
@@ -580,6 +604,7 @@ function removeLoadingIndicator(loadingId) {
 async function generateCharacterImage() {
     const prompt = document.getElementById('char-visual-prompt').value;
     const style = document.querySelector('.style-option.selected').dataset.style;
+    const ratio = document.querySelector('.ratio-option.selected')?.dataset.ratio || 'landscape_16_9';
     
     const fullPrompt = `${style} style, character portrait, ${prompt}`;
     
@@ -588,7 +613,7 @@ async function generateCharacterImage() {
     btn.disabled = true;
     
     try {
-        const imageUrl = await generateImage(fullPrompt);
+        const imageUrl = await generateImage(fullPrompt, ratio);
         currentCharacter.imageUrl = imageUrl;
         
         document.getElementById('char-image-preview').classList.remove('hidden');
@@ -792,6 +817,15 @@ function nextForgeStep(step) {
  */
 function selectStyle(element) {
     document.querySelectorAll('.style-option').forEach(opt => {
+        opt.classList.remove('selected', 'border-primary/40');
+        opt.classList.add('border-white/5', 'opacity-50');
+    });
+    element.classList.add('selected', 'border-primary/40');
+    element.classList.remove('border-white/5', 'opacity-50');
+}
+
+function selectRatio(element) {
+    document.querySelectorAll('.ratio-option').forEach(opt => {
         opt.classList.remove('selected', 'border-primary/40');
         opt.classList.add('border-white/5', 'opacity-50');
     });
