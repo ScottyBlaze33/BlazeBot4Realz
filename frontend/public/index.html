@@ -77,13 +77,43 @@
             0%, 100% { opacity: 1; }
             50% { opacity: .5; }
         }
+        
+        /* Circuit board background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(45deg, rgba(255, 45, 117, 0.02) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(0, 200, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 30px 30px, 30px 30px;
+            background-position: 0 0, 0 0, 0 0, 0 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+        
+        /* Animated glow effect */
+        @keyframes circuit-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        .circuit-glow {
+            animation: circuit-glow 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden">
 <!-- Global Header -->
 <header class="bg-background/80 backdrop-blur-xl fixed top-0 w-full z-50 h-16 flex justify-between items-center px-6 border-b border-white/5">
 <div class="flex items-center gap-3">
-<img alt="BlazeBot Logo" class="w-8 h-8 object-contain rounded-lg" src="https://lh3.googleusercontent.com/aida/ADBb0ui6QskyNIJZxITYQ9dL2oWscmg7S7iPovNQlwyPA0XRDoai7yn_F8mCVS9m8kg7G1blXTtTavJDC7ApnkjkKI1EHbM6TBrhgM5mI9zCiWFLje1SFxjS0Azg9l8PfvTDiA3Ae48kIxq9STgkBh52GV_fTMzlkT9I_TmE80qNnorQPvs04x6rgQBykN-Qo73goAMQNFpL41sNaPHtLn29SIjoy3hQwvl63H8YZcSMu6-VzXZpfw71aJwTn3DHpYw2rTiuIvHAMhzK"/>
+<img alt="BlazeBot Logo" class="w-10 h-10 object-contain" src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/yb2drrl9_1000315386.png"/>
 <h1 class="text-xl font-black tracking-[0.2em] text-primary font-headline uppercase">BLAZEBOT</h1>
 </div>
 <div class="flex items-center gap-4">
@@ -92,17 +122,21 @@
 </div>
 </header>
 <main class="pt-20 pb-32 px-4 max-w-2xl mx-auto min-h-screen relative">
-<!-- AI Pulse Decoration -->
-<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] -z-10 pointer-events-none"></div>
-<!-- 1. CHAT PAGE -->
+<!-- Green Flame Pulse Decoration -->
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-green-500/10 via-primary/5 to-transparent blur-[120px] -z-10 pointer-events-none circuit-glow"></div>
+<!-- 1. COLLECTIVE - GROUP CHAT PAGE -->
 <section class="page-transition active space-y-6" id="page-chat">
+<div class="text-center mb-6">
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Collective</h2>
+<p class="text-on-surface-variant text-xs">Group Chat Arena</p>
+</div>
 <div class="flex flex-col gap-6" id="chat-messages">
 <!-- Initial welcome message -->
 <div class="flex flex-col items-start max-w-[85%]">
-<div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
-<p class="text-on-surface-variant leading-relaxed">Neural link established. How shall we synthesize the future today, Architect?</p>
+<div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
+<p class="text-on-surface-variant leading-relaxed">🔥 Welcome to The Collective! Chat with all your AI bots together here.</p>
 </div>
-<span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">SYSTEM SYNCED</span>
+<span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">SYSTEM ONLINE</span>
 </div>
 </div>
 <!-- Sticky Chat Input -->
@@ -111,7 +145,7 @@
 <button id="image-gen-btn" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
 <span class="material-symbols-outlined">image_search</span>
 </button>
-<input id="chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Prompt the Monolith..." type="text"/>
+<input id="chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Talk to the collective..." type="text"/>
 <button id="send-btn" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
 <span class="material-symbols-outlined">send</span>
 </button>
@@ -119,11 +153,11 @@
 </div>
 </section>
 
-<!-- 2. FORGE PAGE -->
+<!-- 2. CREATOR - CHARACTER FORGE PAGE -->
 <section class="page-transition space-y-8" id="page-forge">
 <div class="space-y-4">
 <div class="flex justify-between items-center">
-<h2 class="text-2xl font-black tracking-tight text-white uppercase">Character Forge</h2>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Creator</h2>
 <div class="flex gap-1">
 <div class="w-6 h-1 rounded-full transition-colors duration-300 bg-primary" id="forge-dot-1"></div>
 <div class="w-6 h-1 rounded-full transition-colors duration-300 bg-surface-container" id="forge-dot-2"></div>
@@ -256,23 +290,37 @@
 </div>
 </section>
 
-<!-- 3. CIRCUIT PAGE -->
+<!-- 3. YOUR BOTS - BOT STORAGE PAGE -->
 <section class="page-transition space-y-8" id="page-circuit">
 <div class="flex justify-between items-end">
 <div>
-<h2 class="text-2xl font-black tracking-tight text-white uppercase">The Circuit</h2>
-<p class="text-on-surface-variant text-xs">Active Companion Manifest</p>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">Your Bots</h2>
+<p class="text-on-surface-variant text-xs">Click a bot to chat 1-on-1</p>
 </div>
 <div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="circuit-count">0/5 UNITS ONLINE</div>
 </div>
 <div class="grid grid-cols-2 gap-4" id="character-grid">
 <div class="col-span-2 text-center text-on-surface-variant py-12">
-<p>No characters created yet. Visit the Forge to create your first companion.</p>
+<p>No bots created yet. Visit the Creator to forge your first bot!</p>
 </div>
 </div>
 </section>
 
-<!-- 4. API / SETTINGS PAGE -->
+<!-- 4. BOT.ME PERSONAS PAGE -->
+<section class="page-transition space-y-8" id="page-botme">
+<div class="text-center space-y-2">
+<span class="material-symbols-outlined text-primary text-4xl">psychology</span>
+<h2 class="text-2xl font-black tracking-tight text-white uppercase">Bot.ME</h2>
+<p class="text-on-surface-variant text-xs">Your AI Personas & Identities</p>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="col-span-1 text-center text-on-surface-variant py-12">
+<p>Coming soon: Create and manage your AI personas here!</p>
+</div>
+</div>
+</section>
+
+<!-- 5. API / SETTINGS PAGE -->
 <section class="page-transition space-y-8" id="page-api">
 <div class="text-center space-y-2">
 <span class="material-symbols-outlined text-primary text-4xl">hub</span>
@@ -318,28 +366,27 @@
 </div>
 </div>
 <p class="text-center text-[10px] text-on-surface-variant/40 max-w-[200px] mx-auto uppercase tracking-tighter">
-                Keys are stored locally within the obsidian monolith.
+                Keys stored securely in your browser
             </p>
 </section>
 </main>
 
 <!-- Global Bottom Navigation -->
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-background/80 backdrop-blur-xl z-50 rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(255,45,117,0.1)] border-t border-white/5">
-<button class="nav-item flex flex-col items-center justify-center text-primary bg-surface-container-high rounded-full px-6 py-2 transition-all" id="nav-chat" onclick="showPage('chat')">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forum</span>
-<span class="font-headline text-[10px] font-bold mt-1 uppercase">Chat</span>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-6 pt-3 bg-background/90 backdrop-blur-xl z-50 border-t border-white/5">
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-chat" onclick="showPage('chat')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/xm8gkh17_1000315392.png" alt="Collective" class="w-16 h-16 object-contain"/>
 </button>
-<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-forge" onclick="showPage('forge')">
-<span class="material-symbols-outlined">auto_awesome</span>
-<span class="font-headline text-[10px] font-bold mt-1 uppercase">Forge</span>
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-forge" onclick="showPage('forge')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/p76b2dmx_1000315389.png" alt="Creator" class="w-16 h-16 object-contain"/>
 </button>
-<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-circuit" onclick="showPage('circuit')">
-<span class="material-symbols-outlined">layers</span>
-<span class="font-headline text-[10px] font-bold mt-1 uppercase">Circuit</span>
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-circuit" onclick="showPage('circuit')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/7984vxft_1000315390.png" alt="Your Bots" class="w-16 h-16 object-contain"/>
 </button>
-<button class="nav-item flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 transition-all hover:text-white" id="nav-api" onclick="showPage('api')">
-<span class="material-symbols-outlined">api</span>
-<span class="font-headline text-[10px] font-bold mt-1 uppercase">API</span>
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-botme" onclick="showPage('botme')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/rqs7ufap_1000315391.png" alt="Bot.ME" class="w-16 h-16 object-contain"/>
+</button>
+<button class="nav-item flex flex-col items-center justify-center transition-all" id="nav-api" onclick="showPage('api')">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/bc7yv5n2_1000315393.png" alt="API Keys" class="w-16 h-16 object-contain"/>
 </button>
 </nav>
 
@@ -744,7 +791,7 @@ document.getElementById('chat-input').addEventListener('keypress', (e) => {
  */
 const AppRouter = {
     currentPage: 'chat',
-    pages: ['chat', 'forge', 'circuit', 'api'],
+    pages: ['chat', 'forge', 'circuit', 'botme', 'api'],
 
     init() {
         this.showPage(this.currentPage);
@@ -768,18 +815,14 @@ const AppRouter = {
 
     updateNav(activeId) {
         document.querySelectorAll('.nav-item').forEach(nav => {
-            nav.classList.remove('text-primary', 'bg-surface-container-high');
-            nav.classList.add('text-on-surface-variant');
-            const icon = nav.querySelector('.material-symbols-outlined');
-            if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+            nav.style.opacity = '0.5';
+            nav.style.transform = 'scale(0.9)';
         });
 
         const activeNav = document.getElementById('nav-' + activeId);
         if (activeNav) {
-            activeNav.classList.remove('text-on-surface-variant');
-            activeNav.classList.add('text-primary', 'bg-surface-container-high');
-            const activeIcon = activeNav.querySelector('.material-symbols-outlined');
-            if (activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
+            activeNav.style.opacity = '1';
+            activeNav.style.transform = 'scale(1)';
         }
     }
 };
