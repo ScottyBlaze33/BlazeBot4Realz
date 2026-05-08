@@ -177,14 +177,18 @@
 </div>
 
 <div class="space-y-2">
-<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Your Character</label>
-<select id="your-character" class="w-full bg-surface-container border-none rounded-xl p-3 text-white focus:ring-1 focus:ring-primary/40">
-<option value="">Select your character...</option>
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Your Avatar (Persona)</label>
+<select id="your-avatar" class="w-full bg-surface-container border-none rounded-xl p-3 text-white focus:ring-1 focus:ring-primary/40">
+<option value="">Select your persona...</option>
 </select>
+<p class="text-[10px] text-on-surface-variant px-1">Choose which persona YOU will be in this chat</p>
 </div>
 
 <div class="space-y-2">
 <label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Select Bots (up to 5)</label>
+<p class="text-[10px] text-on-surface-variant px-1 mb-2">
+<span id="bots-selected-count" class="text-primary font-bold">0/5</span> bots selected for group chat
+</p>
 <div class="grid grid-cols-1 gap-2" id="bot-selector-list">
 <p class="text-on-surface-variant text-sm text-center py-4">Create some bots first in the Creator!</p>
 </div>
@@ -359,11 +363,10 @@ GENERATE VOICE
 <p class="text-on-surface-variant text-xs">Click a bot to chat 1-on-1</p>
 </div>
 <div class="flex items-center gap-3">
-<button onclick="toggleBotMeSection()" class="bg-primary/20 text-primary px-4 py-2 rounded-xl font-bold text-sm hover:bg-primary/30 transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">person</span>
-Bot.ME
+<button onclick="toggleBotMeSection()" class="hover:scale-105 transition-transform">
+<img src="https://customer-assets.emergentagent.com/job_review-station-5/artifacts/xlfhg06w_1000315391.png" alt="Bot.ME" class="w-14 h-14 object-contain"/>
 </button>
-<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="circuit-count">0/5 UNITS ONLINE</div>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="circuit-count">0 BOTS CREATED</div>
 </div>
 </div>
 
@@ -887,7 +890,7 @@ function renderCharacters() {
     const grid = document.getElementById('character-grid');
     const count = document.getElementById('circuit-count');
     
-    count.textContent = `${characters.length}/5 UNITS ONLINE`;
+    count.textContent = `${characters.length} BOT${characters.length !== 1 ? 'S' : ''} CREATED`;
     
     if (characters.length === 0) {
         grid.innerHTML = `
@@ -1136,16 +1139,23 @@ async function sendNavBotMessage(message) {
  */
 function populateBotSelector() {
     const botList = document.getElementById('bot-selector-list');
-    const yourCharSelect = document.getElementById('your-character');
+    const yourAvatarSelect = document.getElementById('your-avatar');
+    const countDisplay = document.getElementById('bots-selected-count');
+    
+    // Populate your avatar dropdown with personas
+    yourAvatarSelect.innerHTML = '<option value="">Select your persona...</option>';
+    if (personas.length > 0) {
+        yourAvatarSelect.innerHTML += personas.map(persona => 
+            `<option value="${persona.id}">${persona.name}</option>`
+        ).join('');
+    } else {
+        yourAvatarSelect.innerHTML += '<option value="" disabled>No personas created - use Bot.ME</option>';
+    }
     
     if (characters.length === 0) {
         botList.innerHTML = '<p class="text-on-surface-variant text-sm text-center py-4">Create some bots first in the Creator!</p>';
         return;
     }
-    
-    // Populate your character dropdown
-    yourCharSelect.innerHTML = '<option value="">Select your character...</option>' + 
-        characters.map(char => `<option value="${char.id}">${char.name}</option>`).join('');
     
     // Populate bot selector
     botList.innerHTML = characters.map(char => `
@@ -1173,6 +1183,8 @@ function populateBotSelector() {
             } else {
                 selectedGroupBots = selectedGroupBots.filter(id => id !== botId);
             }
+            // Update count
+            countDisplay.textContent = `${selectedGroupBots.length}/5`;
         });
     });
 }
@@ -1180,10 +1192,10 @@ function populateBotSelector() {
 function startGroupChat() {
     const groupName = document.getElementById('group-name').value;
     const context = document.getElementById('group-context').value;
-    const yourCharId = document.getElementById('your-character').value;
+    const yourAvatarId = document.getElementById('your-avatar').value;
     
-    if (!groupName || !context || !yourCharId || selectedGroupBots.length === 0) {
-        alert('Please fill all fields and select at least one bot!');
+    if (!groupName || !context || !yourAvatarId || selectedGroupBots.length === 0) {
+        alert('Please fill all fields, select your avatar, and select at least one bot!');
         return;
     }
     
