@@ -198,8 +198,17 @@
 </div>
 
 <!-- Group Chat Interface (hidden by default) -->
-<div id="group-chat-interface" class="hidden">
-<div class="flex flex-col gap-4" id="group-chat-messages"></div>
+<div id="group-chat-interface" class="hidden space-y-6">
+<div class="flex items-center justify-between mb-4">
+<button onclick="backToGroupSetup()" class="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="text-sm">Back to Setup</span>
+</button>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="group-name-display"></div>
+</div>
+
+<div class="flex flex-col gap-4 mb-32" id="group-chat-messages"></div>
+
 <!-- Bot Selection Bar at bottom -->
 <div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 z-40">
 <div class="bg-surface-container rounded-2xl p-3 mb-3 border border-primary/20">
@@ -207,8 +216,11 @@
 <div class="flex gap-2 overflow-x-auto" id="group-bot-avatars"></div>
 </div>
 <div class="bg-surface border border-outline/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
-<input id="group-chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Your message..." type="text"/>
-<button id="group-send-btn" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<button onclick="sendGroupMessage(true)" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">image_search</span>
+</button>
+<input id="group-chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Your message..." type="text" onkeypress="if(event.key==='Enter'){sendGroupMessage(false);}"/>
+<button onclick="sendGroupMessage(false)" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
@@ -425,6 +437,40 @@ SAVE PERSONA
 </div>
 </section>
 
+<!-- 1-ON-1 CHAT INTERFACE (Hidden by default) -->
+<section class="page-transition space-y-6" id="page-solo-chat">
+<div class="flex items-center justify-between mb-4">
+<button onclick="closeSoloChat()" class="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="text-sm">Back to Your Bots</span>
+</button>
+<button id="play-bot-voice-btn" onclick="playCurrentBotVoice()" class="bg-primary/20 p-3 rounded-full hover:bg-primary/30 transition-all">
+<span class="material-symbols-outlined text-primary">volume_up</span>
+</button>
+</div>
+
+<div class="text-center mb-6">
+<div id="solo-chat-bot-avatar" class="w-20 h-20 rounded-full mx-auto mb-3 bg-primary/20"></div>
+<h2 id="solo-chat-bot-name" class="text-2xl font-black text-white uppercase"></h2>
+<p id="solo-chat-bot-intro" class="text-on-surface-variant text-xs mt-1"></p>
+</div>
+
+<div class="flex flex-col gap-4 mb-20" id="solo-chat-messages"></div>
+
+<!-- Chat Input -->
+<div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-40">
+<div class="bg-surface border border-outline/20 rounded-full flex items-center p-2 shadow-2xl backdrop-blur-xl">
+<button id="solo-image-gen-btn" onclick="sendSoloChatMessage(true)" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">image_search</span>
+</button>
+<input id="solo-chat-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 placeholder:text-outline" placeholder="Chat with your bot..." type="text" onkeypress="if(event.key==='Enter'){sendSoloChatMessage(false);}"/>
+<button onclick="sendSoloChatMessage(false)" class="bg-primary text-white p-2 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</section>
+
 <!-- 4. YOUR BOTS - BOT STORAGE PAGE -->
 <section class="page-transition space-y-8" id="page-circuit">
 <div class="text-center space-y-2">
@@ -525,6 +571,10 @@ let currentPersonaImage = null;
 
 // Group chat state
 let selectedGroupBots = [];
+
+// Solo chat state
+let currentSoloChatBot = null;
+let soloChatHistory = [];
 
 /**
  * Define showPage as global function immediately
@@ -902,7 +952,7 @@ function renderCharacters() {
     }
     
     grid.innerHTML = characters.map(char => `
-        <div class="bg-surface-container rounded-2xl overflow-hidden border border-white/5 relative h-48">
+        <div onclick="openSoloChat(${char.id})" class="bg-surface-container rounded-2xl overflow-hidden border border-white/5 relative h-48 cursor-pointer hover:border-primary/40 transition-all">
             ${char.imageUrl ? `<img alt="${char.name}" class="w-full h-full object-cover grayscale brightness-50" src="${char.imageUrl}"/>` : ''}
             <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
             <div class="absolute bottom-4 left-4">
@@ -1202,15 +1252,19 @@ function startGroupChat() {
     // Hide setup, show chat
     document.querySelector('#page-collective > .space-y-4').classList.add('hidden');
     document.getElementById('group-chat-interface').classList.remove('hidden');
+    document.getElementById('group-name-display').textContent = groupName;
     
     // Setup bot avatars
     const avatarContainer = document.getElementById('group-bot-avatars');
     avatarContainer.innerHTML = selectedGroupBots.map(botId => {
         const bot = characters.find(c => c.id === botId);
         return `
-            <button class="group-bot-avatar flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 transition-all" data-bot-id="${botId}">
+            <button onclick="makeSelectedBotRespond(${botId})" class="group-bot-avatar flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 transition-all">
                 ${bot.imageUrl ? `<img src="${bot.imageUrl}" alt="${bot.name}" class="w-12 h-12 rounded-full object-cover border-2 border-primary/40"/>` : '<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">?</div>'}
                 <span class="text-[8px] font-bold">${bot.name}</span>
+                <button onclick="event.stopPropagation(); playBotVoiceInGroup(${botId})" class="text-primary hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-xs">volume_up</span>
+                </button>
             </button>
         `;
     }).join('');
@@ -1223,37 +1277,160 @@ function startGroupChat() {
             <p class="text-sm text-on-surface-variant">${context}</p>
         </div>
     `;
+}
+
+function backToGroupSetup() {
+    document.querySelector('#page-collective > .space-y-4').classList.remove('hidden');
+    document.getElementById('group-chat-interface').classList.add('hidden');
+    selectedGroupBots = [];
+    document.getElementById('bots-selected-count').textContent = '0/5';
+}
+
+async function sendGroupMessage(includeImage) {
+    const input = document.getElementById('group-chat-input');
+    const message = input.value.trim();
     
-    // Bot avatar click listeners
-    document.querySelectorAll('.group-bot-avatar').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const botId = parseInt(btn.dataset.botId);
-            makeSelectedBotRespond(botId);
-        });
-    });
+    if (!message) return;
+    
+    const chatContainer = document.getElementById('group-chat-messages');
+    
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'flex flex-col items-end max-w-[85%] self-end ml-auto';
+    userMsg.innerHTML = `
+        <div class="bg-primary text-white rounded-2xl rounded-tr-none p-4 shadow-lg shadow-primary/10">
+            <p class="font-medium">${message}</p>
+        </div>
+        <span class="text-[10px] font-bold tracking-widest text-primary mt-2 mr-1">YOU</span>
+    `;
+    chatContainer.appendChild(userMsg);
+    input.value = '';
+    
+    // If image requested
+    if (includeImage) {
+        const imageLoadingDiv = document.createElement('div');
+        imageLoadingDiv.id = 'group-img-loading';
+        imageLoadingDiv.className = 'flex flex-col items-center w-full';
+        imageLoadingDiv.innerHTML = `
+            <div class="bg-surface-container rounded-xl p-4 w-full max-w-md">
+                <p class="text-sm text-on-surface-variant text-center loading-pulse">Generating image...</p>
+            </div>
+        `;
+        chatContainer.appendChild(imageLoadingDiv);
+        
+        try {
+            const imageUrl = await generateImage(message, 'square_hd');
+            document.getElementById('group-img-loading').remove();
+            
+            const imgMsg = document.createElement('div');
+            imgMsg.className = 'flex flex-col items-center w-full';
+            imgMsg.innerHTML = `
+                <div class="bg-surface-container rounded-2xl overflow-hidden p-2 max-w-md">
+                    <img src="${imageUrl}" alt="Generated" class="w-full rounded-xl"/>
+                </div>
+            `;
+            chatContainer.appendChild(imgMsg);
+        } catch (error) {
+            document.getElementById('group-img-loading')?.remove();
+            console.error('Image error:', error);
+        }
+    }
+    
+    chatContainer.lastChild.scrollIntoView({ behavior: 'smooth' });
 }
 
 async function makeSelectedBotRespond(botId) {
     const bot = characters.find(c => c.id === botId);
-    const chatMessages = document.getElementById('group-chat-messages');
+    const chatContainer = document.getElementById('group-chat-messages');
     
     // Add loading
     const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'flex items-start gap-2';
+    loadingDiv.id = 'bot-loading-' + botId;
+    loadingDiv.className = 'flex items-start gap-2 max-w-[85%]';
     loadingDiv.innerHTML = `
         ${bot.imageUrl ? `<img src="${bot.imageUrl}" class="w-10 h-10 rounded-full"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20"></div>'}
-        <div class="bg-surface-container rounded-2xl p-3 max-w-[80%]">
+        <div class="bg-surface-container rounded-2xl rounded-tl-none p-3 flex-1">
             <p class="text-[10px] text-primary font-bold mb-1">${bot.name}</p>
             <p class="text-sm loading-pulse">Thinking...</p>
         </div>
     `;
-    chatMessages.appendChild(loadingDiv);
+    chatContainer.appendChild(loadingDiv);
     loadingDiv.scrollIntoView({ behavior: 'smooth' });
     
-    // Call API (simplified for now)
-    setTimeout(() => {
-        loadingDiv.querySelector('.loading-pulse').textContent = `Hey! I'm ${bot.name}. This is a group chat response!`;
-    }, 1000);
+    try {
+        const keys = getAPIKeys();
+        const groupName = document.getElementById('group-name').value;
+        const context = document.getElementById('group-context').value;
+        
+        const response = await fetch(API_CONFIG.deepseek.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keys.deepseek}`
+            },
+            body: JSON.stringify({
+                model: API_CONFIG.deepseek.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are ${bot.name} in a group chat called "${groupName}". Context: ${context}. ${bot.intro}. Respond in character briefly.`
+                    },
+                    { role: 'user', content: 'Join the conversation with a brief message.' }
+                ],
+                stream: false,
+                temperature: 0.9
+            })
+        });
+        
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content;
+        
+        document.getElementById('bot-loading-' + botId).remove();
+        
+        const botMsg = document.createElement('div');
+        botMsg.className = 'flex items-start gap-2 max-w-[85%]';
+        botMsg.innerHTML = `
+            ${bot.imageUrl ? `<img src="${bot.imageUrl}" class="w-10 h-10 rounded-full object-cover"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20"></div>'}
+            <div class="bg-surface-container rounded-2xl rounded-tl-none p-3 flex-1">
+                <p class="text-[10px] text-primary font-bold mb-1">${bot.name}</p>
+                <p class="text-sm text-on-surface-variant">${botResponse}</p>
+            </div>
+        `;
+        chatContainer.appendChild(botMsg);
+        botMsg.scrollIntoView({ behavior: 'smooth' });
+        
+    } catch (error) {
+        document.getElementById('bot-loading-' + botId)?.remove();
+        console.error('Bot response error:', error);
+    }
+}
+
+async function playBotVoiceInGroup(botId) {
+    const bot = characters.find(c => c.id === botId);
+    if (!bot) return;
+    
+    try {
+        const keys = getAPIKeys();
+        const response = await fetch(`${API_CONFIG.elevenlabs.url}/pNInz6obpgDQGcFmaJgB`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'xi-api-key': keys.elevenlabs
+            },
+            body: JSON.stringify({
+                text: `Hi, I'm ${bot.name}!`,
+                model_id: "eleven_turbo_v2_5",
+                voice_settings: bot.voiceSettings || { stability: 0.75, similarity_boost: 0.90 }
+            })
+        });
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+    } catch (error) {
+        console.error('Voice error:', error);
+    }
 }
 
 /**
@@ -1261,7 +1438,7 @@ async function makeSelectedBotRespond(botId) {
  */
 const AppRouter = {
     currentPage: 'blazebot',
-    pages: ['blazebot', 'forge', 'circuit', 'collective', 'api'],
+    pages: ['blazebot', 'forge', 'circuit', 'solo-chat', 'collective', 'api'],
 
     init() {
         this.showPage(this.currentPage);
@@ -1362,6 +1539,190 @@ function selectGender(element) {
 function toggleKeyVisibility(inputId) {
     const input = document.getElementById(inputId);
     input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+/**
+ * 1-on-1 Solo Chat Functions
+ */
+function openSoloChat(botId) {
+    const bot = characters.find(c => c.id === botId);
+    if (!bot) return;
+    
+    currentSoloChatBot = bot;
+    soloChatHistory = [];
+    
+    // Update UI
+    document.getElementById('solo-chat-bot-name').textContent = bot.name;
+    document.getElementById('solo-chat-bot-intro').textContent = bot.intro;
+    
+    const avatar = document.getElementById('solo-chat-bot-avatar');
+    if (bot.imageUrl) {
+        avatar.innerHTML = `<img src="${bot.imageUrl}" alt="${bot.name}" class="w-full h-full object-cover rounded-full"/>`;
+    } else {
+        avatar.innerHTML = '<span class="material-symbols-outlined text-primary text-4xl">smart_toy</span>';
+    }
+    
+    // Clear messages
+    document.getElementById('solo-chat-messages').innerHTML = `
+        <div class="flex flex-col items-start max-w-[85%]">
+            <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
+                <p class="text-on-surface-variant leading-relaxed">${bot.intro}</p>
+            </div>
+            <span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">${bot.name.toUpperCase()}</span>
+        </div>
+    `;
+    
+    // Show solo chat page
+    showPage('solo-chat');
+}
+
+function closeSoloChat() {
+    currentSoloChatBot = null;
+    soloChatHistory = [];
+    showPage('circuit');
+}
+
+async function sendSoloChatMessage(includeImage) {
+    const input = document.getElementById('solo-chat-input');
+    const message = input.value.trim();
+    
+    if (!message || !currentSoloChatBot) return;
+    
+    const chatContainer = document.getElementById('solo-chat-messages');
+    
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'flex flex-col items-end max-w-[85%] self-end ml-auto';
+    userMsg.innerHTML = `
+        <div class="bg-primary text-white rounded-2xl rounded-tr-none p-4 shadow-lg shadow-primary/10">
+            <p class="font-medium">${message}</p>
+        </div>
+    `;
+    chatContainer.appendChild(userMsg);
+    input.value = '';
+    
+    // Add to history
+    soloChatHistory.push({ role: 'user', content: message });
+    
+    // Loading indicator
+    const loadingId = 'solo-loading-' + Date.now();
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = loadingId;
+    loadingDiv.className = 'flex flex-col items-start max-w-[85%]';
+    loadingDiv.innerHTML = `
+        <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-white/5">
+            <p class="text-on-surface-variant loading-pulse">Thinking...</p>
+        </div>
+    `;
+    chatContainer.appendChild(loadingDiv);
+    loadingDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    try {
+        const keys = getAPIKeys();
+        const response = await fetch(API_CONFIG.deepseek.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keys.deepseek}`
+            },
+            body: JSON.stringify({
+                model: API_CONFIG.deepseek.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are ${currentSoloChatBot.name}. ${currentSoloChatBot.intro}. Respond in character. Be concise and engaging.`
+                    },
+                    ...soloChatHistory
+                ],
+                stream: false,
+                temperature: 0.8
+            })
+        });
+        
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content;
+        
+        soloChatHistory.push({ role: 'assistant', content: botResponse });
+        
+        document.getElementById(loadingId).remove();
+        
+        // Add bot response
+        const botMsg = document.createElement('div');
+        botMsg.className = 'flex flex-col items-start max-w-[85%]';
+        botMsg.innerHTML = `
+            <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
+                <p class="text-on-surface-variant leading-relaxed">${botResponse}</p>
+            </div>
+            <span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">${currentSoloChatBot.name.toUpperCase()}</span>
+        `;
+        chatContainer.appendChild(botMsg);
+        
+        // If image requested
+        if (includeImage) {
+            const imageLoadingDiv = document.createElement('div');
+            imageLoadingDiv.id = 'img-loading';
+            imageLoadingDiv.className = 'flex flex-col items-center w-full';
+            imageLoadingDiv.innerHTML = `
+                <div class="bg-surface-container rounded-xl p-4 w-full max-w-md">
+                    <p class="text-sm text-on-surface-variant text-center loading-pulse">Generating image...</p>
+                </div>
+            `;
+            chatContainer.appendChild(imageLoadingDiv);
+            
+            try {
+                const imageUrl = await generateImage(message, 'square_hd');
+                document.getElementById('img-loading').remove();
+                
+                const imgMsg = document.createElement('div');
+                imgMsg.className = 'flex flex-col items-center w-full';
+                imgMsg.innerHTML = `
+                    <div class="bg-surface-container rounded-2xl overflow-hidden p-2 max-w-md">
+                        <img src="${imageUrl}" alt="Generated" class="w-full rounded-xl"/>
+                    </div>
+                `;
+                chatContainer.appendChild(imgMsg);
+            } catch (error) {
+                document.getElementById('img-loading')?.remove();
+                console.error('Image error:', error);
+            }
+        }
+        
+        chatContainer.lastChild.scrollIntoView({ behavior: 'smooth' });
+        
+    } catch (error) {
+        document.getElementById(loadingId)?.remove();
+        console.error('Chat error:', error);
+    }
+}
+
+async function playCurrentBotVoice() {
+    if (!currentSoloChatBot || !currentSoloChatBot.voicePrompt) return;
+    
+    try {
+        const keys = getAPIKeys();
+        const response = await fetch(`${API_CONFIG.elevenlabs.url}/pNInz6obpgDQGcFmaJgB`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'xi-api-key': keys.elevenlabs
+            },
+            body: JSON.stringify({
+                text: `Hello! I'm ${currentSoloChatBot.name}. ${currentSoloChatBot.intro}`,
+                model_id: "eleven_turbo_v2_5",
+                voice_settings: currentSoloChatBot.voiceSettings || {
+                    stability: 0.75,
+                    similarity_boost: 0.90
+                }
+            })
+        });
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+    } catch (error) {
+        console.error('Voice playback error:', error);
+    }
 }
 
 /**
