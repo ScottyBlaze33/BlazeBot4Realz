@@ -267,7 +267,7 @@
 <div class="space-y-2">
 <label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Gender Identity</label>
 <div class="grid grid-cols-3 gap-3">
-<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-primary/40 cursor-pointer" data-gender="man" onclick="selectGender(this)">
+<div class="gender-option bg-surface-container p-4 rounded-2xl flex flex-col items-center gap-2 border border-primary/40 cursor-pointer selected" data-gender="man" onclick="selectGender(this)">
 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">man</span>
 <span class="text-[10px] font-bold">MAN</span>
 </div>
@@ -510,8 +510,8 @@ SAVE PERSONA
 </div>
 </section>
 
-<!-- 4. YOUR BOTS - BOT STORAGE PAGE -->
-<section class="page-transition space-y-8" id="page-circuit">
+<!-- 5. CONFIGURATION HUB - API KEYS PAGE -->
+<section class="page-transition space-y-8" id="page-api">
 <div class="text-center space-y-2">
 <span class="material-symbols-outlined text-primary text-4xl">hub</span>
 <h2 class="text-2xl font-black tracking-tight text-white uppercase">Configuration Hub</h2>
@@ -929,17 +929,25 @@ async function generateCharacterImage() {
 }
 
 async function createCharacter() {
-    const name = document.getElementById('char-name').value;
-    const gender = document.querySelector('.gender-option.selected')?.dataset.gender;
-    const intro = document.getElementById('char-intro').value;
-    const visualPrompt = document.getElementById('char-visual-prompt').value;
-    const style = document.querySelector('.style-option.selected').dataset.style;
-    const voicePrompt = document.getElementById('voice-prompt').value;
+    // Sync all field state into currentCharacter before validating
+    saveAllForgeFields();
+    
+    const name = document.getElementById('char-name').value || currentCharacter.name || '';
+    const gender = (document.querySelector('.gender-option.selected')?.dataset.gender) || currentCharacter.gender || '';
+    const intro = document.getElementById('char-intro').value || currentCharacter.intro || '';
+    const visualPrompt = document.getElementById('char-visual-prompt').value || currentCharacter.visualPrompt || '';
+    const styleEl = document.querySelector('.style-option.selected');
+    const style = (styleEl && styleEl.dataset.style) || currentCharacter.style || 'realistic';
+    const voicePrompt = document.getElementById('voice-prompt').value || currentCharacter.voicePrompt || '';
     const stability = document.getElementById('stability-slider').value;
     const clarity = document.getElementById('clarity-slider').value;
     
     if (!name || !gender || !intro) {
-        alert('Please complete all required fields in steps 1-3');
+        const missing = [];
+        if (!name) missing.push('Name (Step 1)');
+        if (!gender) missing.push('Gender (Step 1)');
+        if (!intro) missing.push('Introduction (Step 1)');
+        alert('Missing required fields: ' + missing.join(', '));
         return;
     }
     
@@ -1818,11 +1826,11 @@ function selectRatio(element) {
 
 function selectGender(element) {
     document.querySelectorAll('.gender-option').forEach(opt => {
-        opt.classList.remove('border-primary/40');
+        opt.classList.remove('selected', 'border-primary/40');
         opt.classList.add('border-white/5', 'opacity-50');
         opt.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 0";
     });
-    element.classList.add('border-primary/40');
+    element.classList.add('selected', 'border-primary/40');
     element.classList.remove('border-white/5', 'opacity-50');
     element.querySelector('.material-symbols-outlined').style.fontVariationSettings = "'FILL' 1";
 }
