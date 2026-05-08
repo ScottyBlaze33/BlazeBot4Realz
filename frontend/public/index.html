@@ -358,8 +358,63 @@ GENERATE VOICE
 <h2 class="text-2xl font-black tracking-tight text-white uppercase">Your Bots</h2>
 <p class="text-on-surface-variant text-xs">Click a bot to chat 1-on-1</p>
 </div>
+<div class="flex items-center gap-3">
+<button onclick="toggleBotMeSection()" class="bg-primary/20 text-primary px-4 py-2 rounded-xl font-bold text-sm hover:bg-primary/30 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">person</span>
+Bot.ME
+</button>
 <div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="circuit-count">0/5 UNITS ONLINE</div>
 </div>
+</div>
+
+<!-- Bot.ME Personas Section (hidden by default) -->
+<div id="botme-section" class="hidden space-y-6 bg-surface-container-high rounded-2xl p-6 border border-primary/20">
+<div class="flex justify-between items-center">
+<h3 class="text-xl font-black text-primary uppercase">My Personas</h3>
+<button onclick="toggleBotMeSection()" class="text-on-surface-variant hover:text-white">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+
+<!-- Create Persona Form -->
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Persona Name</label>
+<input id="persona-name" class="w-full bg-surface-container border-none rounded-xl p-3 text-white focus:ring-1 focus:ring-primary/40" placeholder="Enter persona name..." type="text"/>
+</div>
+
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Context / Description</label>
+<textarea id="persona-context" class="w-full bg-surface-container border-none rounded-xl p-3 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="Describe this persona's personality, traits, background..." rows="3"></textarea>
+</div>
+
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Avatar Image</label>
+<div class="flex items-center gap-4">
+<div id="persona-avatar-preview" class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<label for="persona-image-upload" class="bg-primary/20 text-primary px-4 py-2 rounded-xl font-bold text-sm cursor-pointer hover:bg-primary/30 transition-all">
+Upload Image
+</label>
+<input id="persona-image-upload" type="file" accept="image/*" class="hidden" onchange="previewPersonaImage(event)"/>
+</div>
+</div>
+
+<button onclick="savePersona()" class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-all">
+SAVE PERSONA
+</button>
+</div>
+
+<!-- Saved Personas List -->
+<div id="personas-list" class="space-y-3">
+<p class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase px-1">Saved Personas</p>
+<div id="personas-grid" class="grid grid-cols-2 gap-3">
+<p class="col-span-2 text-center text-on-surface-variant text-sm py-4">No personas created yet.</p>
+</div>
+</div>
+</div>
+
 <div class="grid grid-cols-2 gap-4" id="character-grid">
 <div class="col-span-2 text-center text-on-surface-variant py-12">
 <p>No bots created yet. Visit the Creator to forge your first bot!</p>
@@ -460,6 +515,10 @@ let chatHistory = [];
 // Character storage
 let characters = JSON.parse(localStorage.getItem('blazebot_characters') || '[]');
 let currentCharacter = {};
+
+// Personas storage
+let personas = JSON.parse(localStorage.getItem('blazebot_personas') || '[]');
+let currentPersonaImage = null;
 
 // Group chat state
 let selectedGroupBots = [];
@@ -1291,6 +1350,88 @@ function selectGender(element) {
 function toggleKeyVisibility(inputId) {
     const input = document.getElementById(inputId);
     input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+/**
+ * Bot.ME Personas Functions
+ */
+function toggleBotMeSection() {
+    const section = document.getElementById('botme-section');
+    section.classList.toggle('hidden');
+    if (!section.classList.contains('hidden')) {
+        renderPersonas();
+    }
+}
+
+function previewPersonaImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentPersonaImage = e.target.result;
+            const preview = document.getElementById('persona-avatar-preview');
+            preview.innerHTML = `<img src="${currentPersonaImage}" alt="Avatar" class="w-full h-full object-cover"/>`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function savePersona() {
+    const name = document.getElementById('persona-name').value.trim();
+    const context = document.getElementById('persona-context').value.trim();
+    
+    if (!name || !context) {
+        alert('Please fill in persona name and context!');
+        return;
+    }
+    
+    const persona = {
+        id: Date.now(),
+        name: name,
+        context: context,
+        avatar: currentPersonaImage || ''
+    };
+    
+    personas.push(persona);
+    localStorage.setItem('blazebot_personas', JSON.stringify(personas));
+    
+    // Reset form
+    document.getElementById('persona-name').value = '';
+    document.getElementById('persona-context').value = '';
+    document.getElementById('persona-avatar-preview').innerHTML = '<span class="material-symbols-outlined text-on-surface-variant">person</span>';
+    currentPersonaImage = null;
+    
+    renderPersonas();
+    alert(`Persona "${name}" saved!`);
+}
+
+function renderPersonas() {
+    const grid = document.getElementById('personas-grid');
+    
+    if (personas.length === 0) {
+        grid.innerHTML = '<p class="col-span-2 text-center text-on-surface-variant text-sm py-4">No personas created yet.</p>';
+        return;
+    }
+    
+    grid.innerHTML = personas.map(persona => `
+        <div class="bg-surface-container rounded-xl p-4 flex flex-col items-center gap-2 border border-white/5">
+            ${persona.avatar 
+                ? `<div class="w-16 h-16 rounded-full overflow-hidden"><img src="${persona.avatar}" alt="${persona.name}" class="w-full h-full object-cover"/></div>` 
+                : '<div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center"><span class="material-symbols-outlined text-primary">person</span></div>'
+            }
+            <p class="font-bold text-sm text-center">${persona.name}</p>
+            <p class="text-[10px] text-on-surface-variant text-center line-clamp-2">${persona.context}</p>
+            <button onclick="deletePersona(${persona.id})" class="text-[10px] text-red-400 hover:text-red-300 mt-1">Delete</button>
+        </div>
+    `).join('');
+}
+
+function deletePersona(personaId) {
+    if (confirm('Delete this persona?')) {
+        personas = personas.filter(p => p.id !== personaId);
+        localStorage.setItem('blazebot_personas', JSON.stringify(personas));
+        renderPersonas();
+    }
 }
 
 // Initialize after everything is loaded
