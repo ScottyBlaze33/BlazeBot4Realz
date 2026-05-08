@@ -275,7 +275,7 @@
 <!-- Step 2: Image Gen -->
 <div class="forge-step hidden space-y-6" id="forge-step-2">
 <div class="space-y-2">
-<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Visual Prompt</label>
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Visual Prompt (Full Image/Background)</label>
 <textarea id="char-visual-prompt" class="w-full bg-surface-container border-none rounded-xl p-4 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="A futuristic cyborg with neon accents..." rows="4"></textarea>
 </div>
 <div class="space-y-2">
@@ -314,7 +314,28 @@
 <img id="char-generated-image" class="w-full rounded-xl" alt="Generated character"/>
 </div>
 <button id="generate-char-image-btn" class="w-full py-4 bg-primary/20 text-primary font-bold rounded-xl" onclick="generateCharacterImage()">GENERATE IMAGE</button>
-<div class="flex gap-4">
+
+<!-- Avatar Face (Small Circular) -->
+<div class="space-y-2 mt-6 pt-6 border-t border-white/10">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Avatar Face (Small Circle for Chat Bubbles)</label>
+<div class="flex items-center gap-4">
+<div id="char-avatar-preview" class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center overflow-hidden border-2 border-primary/40">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div class="flex flex-col gap-2">
+<label for="char-avatar-upload" class="bg-primary/20 text-primary px-4 py-2 rounded-xl font-bold text-sm cursor-pointer hover:bg-primary/30 transition-all">
+Upload Face
+</label>
+<input id="char-avatar-upload" type="file" accept="image/*" class="hidden" onchange="previewCharacterAvatar(event)"/>
+<button onclick="generateAvatarFromFullImage()" class="bg-primary/20 text-primary px-4 py-2 rounded-xl font-bold text-sm hover:bg-primary/30 transition-all">
+Use Generated Image
+</button>
+</div>
+</div>
+<p class="text-[10px] text-on-surface-variant px-1">This small face appears next to chat bubbles</p>
+</div>
+
+<div class="flex gap-4 mt-6">
 <button class="flex-1 py-4 bg-surface-container text-white font-bold rounded-xl" onclick="nextForgeStep(1)">BACK</button>
 <button class="flex-[2] py-4 bg-primary text-white font-bold rounded-xl shadow-lg" onclick="nextForgeStep(3)">CONTINUE TO VOICE</button>
 </div>
@@ -1495,11 +1516,40 @@ const AppRouter = {
  * Character Forge Step Manager
  */
 function nextForgeStep(step) {
+    // Save current step data before moving
+    if (step === 2) {
+        // Coming from step 1, save identity data
+        currentCharacter.name = document.getElementById('char-name').value;
+        currentCharacter.gender = document.querySelector('.gender-option.selected')?.dataset.gender;
+        currentCharacter.intro = document.getElementById('char-intro').value;
+    } else if (step === 3) {
+        // Coming from step 2, save image data
+        currentCharacter.visualPrompt = document.getElementById('char-visual-prompt').value;
+        currentCharacter.style = document.querySelector('.style-option.selected')?.dataset.style;
+    } else if (step === 1) {
+        // Going back to step 1, restore data
+        if (currentCharacter.name) {
+            document.getElementById('char-name').value = currentCharacter.name;
+        }
+        if (currentCharacter.gender) {
+            document.querySelectorAll('.gender-option').forEach(opt => {
+                if (opt.dataset.gender === currentCharacter.gender) {
+                    selectGender(opt);
+                }
+            });
+        }
+        if (currentCharacter.intro) {
+            document.getElementById('char-intro').value = currentCharacter.intro;
+        }
+    }
+    
+    // Show/hide steps
     document.querySelectorAll('.forge-step').forEach(s => s.classList.add('hidden'));
     
     const targetStep = document.getElementById('forge-step-' + step);
     if (targetStep) targetStep.classList.remove('hidden');
 
+    // Update progress dots
     for (let i = 1; i <= 3; i++) {
         const dot = document.getElementById('forge-dot-' + i);
         if (dot) {
@@ -1512,6 +1562,19 @@ function nextForgeStep(step) {
             }
         }
     }
+    
+    // Restore step 2 data if going back
+    if (step === 2 && currentCharacter.visualPrompt) {
+        document.getElementById('char-visual-prompt').value = currentCharacter.visualPrompt;
+        if (currentCharacter.style) {
+            document.querySelectorAll('.style-option').forEach(opt => {
+                if (opt.dataset.style === currentCharacter.style) {
+                    selectStyle(opt);
+                }
+            });
+        }
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
