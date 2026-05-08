@@ -198,12 +198,27 @@
 </div>
 </div>
 
+<div class="space-y-2">
+<label class="text-[10px] font-bold tracking-widest text-primary uppercase px-1">Group Chat Background (optional)</label>
+<textarea id="group-bg-prompt" class="w-full bg-surface-container border-none rounded-xl p-3 text-white text-sm focus:ring-1 focus:ring-primary/40" placeholder="Describe a custom background scene for this chat..." rows="2"></textarea>
+<div class="flex items-center gap-3">
+<button id="generate-group-bg-btn" onclick="generateGroupChatBackground()" class="flex-1 py-2 bg-primary/20 text-primary font-bold rounded-xl text-sm hover:bg-primary/30 transition-all">GENERATE BACKGROUND</button>
+<div id="group-bg-preview" class="w-16 h-16 rounded-lg bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">image</span>
+</div>
+</div>
+</div>
+
 <button id="start-group-chat-btn" class="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:scale-[1.02] transition-all">START GROUP CHAT</button>
 </div>
 
 <!-- Group Chat Interface (hidden by default) -->
-<div id="group-chat-interface" class="hidden space-y-6">
-<div class="flex items-center justify-between mb-4">
+<div id="group-chat-interface" class="hidden space-y-6 relative">
+<!-- Chat background image -->
+<div id="group-chat-bg" class="fixed inset-0 -z-10 pointer-events-none opacity-0 transition-opacity duration-500" style="background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+<div id="group-chat-bg-overlay" class="fixed inset-0 -z-10 pointer-events-none bg-background/75"></div>
+
+<div class="flex items-center justify-between mb-4 relative z-10">
 <button onclick="backToGroupSetup()" class="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="text-sm">Back to Setup</span>
@@ -211,7 +226,7 @@
 <div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black" id="group-name-display"></div>
 </div>
 
-<div class="flex flex-col gap-4 mb-32" id="group-chat-messages"></div>
+<div class="flex flex-col gap-4 mb-32 relative z-10" id="group-chat-messages"></div>
 
 <!-- Bot Selection Bar at bottom -->
 <div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 z-40">
@@ -463,24 +478,28 @@ SAVE PERSONA
 </section>
 
 <!-- 1-ON-1 CHAT INTERFACE (Hidden by default) -->
-<section class="page-transition space-y-6" id="page-solo-chat">
-<div class="flex items-center justify-between mb-4">
+<section class="page-transition space-y-6 relative" id="page-solo-chat">
+<!-- Chat background image (full character) -->
+<div id="solo-chat-bg" class="fixed inset-0 -z-10 pointer-events-none opacity-0 transition-opacity duration-500" style="background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+<div id="solo-chat-bg-overlay" class="fixed inset-0 -z-10 pointer-events-none bg-background/75"></div>
+
+<div class="flex items-center justify-between mb-4 relative z-10">
 <button onclick="closeSoloChat()" class="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors">
 <span class="material-symbols-outlined">arrow_back</span>
 <span class="text-sm">Back to Your Bots</span>
 </button>
-<button id="play-bot-voice-btn" onclick="playCurrentBotVoice()" class="bg-primary/20 p-3 rounded-full hover:bg-primary/30 transition-all">
+<button id="play-bot-voice-btn" onclick="speakLastSoloMessage()" class="bg-primary/20 p-3 rounded-full hover:bg-primary/30 transition-all" title="Hear character speak last message">
 <span class="material-symbols-outlined text-primary">volume_up</span>
 </button>
 </div>
 
-<div class="text-center mb-6">
-<div id="solo-chat-bot-avatar" class="w-20 h-20 rounded-full mx-auto mb-3 bg-primary/20"></div>
+<div class="text-center mb-6 relative z-10">
+<div id="solo-chat-bot-avatar" class="w-20 h-20 rounded-full mx-auto mb-3 bg-primary/20 overflow-hidden border-2 border-primary/40"></div>
 <h2 id="solo-chat-bot-name" class="text-2xl font-black text-white uppercase"></h2>
 <p id="solo-chat-bot-intro" class="text-on-surface-variant text-xs mt-1"></p>
 </div>
 
-<div class="flex flex-col gap-4 mb-20" id="solo-chat-messages"></div>
+<div class="flex flex-col gap-4 mb-32 relative z-10" id="solo-chat-messages"></div>
 
 <!-- Chat Input -->
 <div class="fixed bottom-28 left-1/2 -translate-x-1/2 w-full max-w-xl px-4 z-40">
@@ -589,6 +608,7 @@ let chatHistory = [];
 // Character storage
 let characters = JSON.parse(localStorage.getItem('blazebot_characters') || '[]');
 let currentCharacter = {};
+let currentCharacterAvatar = null; // small circular face image (data URL)
 
 // Personas storage
 let personas = JSON.parse(localStorage.getItem('blazebot_personas') || '[]');
@@ -596,6 +616,7 @@ let currentPersonaImage = null;
 
 // Group chat state
 let selectedGroupBots = [];
+let currentGroupChatBg = null; // user-generated custom background for the group chat
 
 // Solo chat state
 let currentSoloChatBot = null;
@@ -935,6 +956,7 @@ async function createCharacter() {
         visualPrompt,
         style,
         imageUrl: currentCharacter.imageUrl || '',
+        avatar: currentCharacterAvatar || currentCharacter.imageUrl || '', // circular face for chat bubbles
         voicePrompt: voicePrompt || 'Default voice',
         voiceId: currentCharacter.voiceId || 'pNInz6obpgDQGcFmaJgB',
         voiceAudio: currentCharacter.voiceAudio || null,
@@ -954,7 +976,9 @@ async function createCharacter() {
     document.getElementById('voice-prompt').value = '';
     document.getElementById('char-image-preview').classList.add('hidden');
     document.getElementById('voice-preview-section').classList.add('hidden');
+    document.getElementById('char-avatar-preview').innerHTML = '<span class="material-symbols-outlined text-on-surface-variant">person</span>';
     currentCharacter = {};
+    currentCharacterAvatar = null;
     generatedVoiceAudio = null;
     
     alert(`Character "${name}" created successfully!`);
@@ -1285,17 +1309,28 @@ function startGroupChat() {
     document.getElementById('group-chat-interface').classList.remove('hidden');
     document.getElementById('group-name-display').textContent = groupName;
     
-    // Setup bot avatars
+    // Setup chat background using user-generated custom group background (if any)
+    const bg = document.getElementById('group-chat-bg');
+    if (currentGroupChatBg) {
+        bg.style.backgroundImage = `url("${currentGroupChatBg}")`;
+        bg.style.opacity = '0.30';
+    } else {
+        bg.style.backgroundImage = 'none';
+        bg.style.opacity = '0';
+    }
+
+    // Setup bot avatars (use small avatar/face if available)
     const avatarContainer = document.getElementById('group-bot-avatars');
     avatarContainer.innerHTML = selectedGroupBots.map(botId => {
         const bot = characters.find(c => c.id === botId);
+        const face = bot.avatar || bot.imageUrl;
         return `
             <button onclick="makeSelectedBotRespond(${botId})" class="group-bot-avatar flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 transition-all">
-                ${bot.imageUrl ? `<img src="${bot.imageUrl}" alt="${bot.name}" class="w-12 h-12 rounded-full object-cover border-2 border-primary/40"/>` : '<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">?</div>'}
+                ${face ? `<img src="${face}" alt="${bot.name}" class="w-12 h-12 rounded-full object-cover border-2 border-primary/40"/>` : '<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">?</div>'}
                 <span class="text-[8px] font-bold">${bot.name}</span>
-                <button onclick="event.stopPropagation(); playBotVoiceInGroup(${botId})" class="text-primary hover:scale-110 transition-transform">
+                <span onclick="event.stopPropagation(); playBotVoiceInGroup(${botId})" class="text-primary hover:scale-110 transition-transform cursor-pointer">
                     <span class="material-symbols-outlined text-xs">volume_up</span>
-                </button>
+                </span>
             </button>
         `;
     }).join('');
@@ -1315,6 +1350,10 @@ function backToGroupSetup() {
     document.getElementById('group-chat-interface').classList.add('hidden');
     selectedGroupBots = [];
     document.getElementById('bots-selected-count').textContent = '0/5';
+    const bg = document.getElementById('group-chat-bg');
+    if (bg) { bg.style.backgroundImage = 'none'; bg.style.opacity = '0'; }
+    // Clear bot selector checkboxes
+    document.querySelectorAll('.bot-checkbox').forEach(cb => cb.checked = false);
 }
 
 async function sendGroupMessage(includeImage) {
@@ -1373,14 +1412,15 @@ async function sendGroupMessage(includeImage) {
 async function makeSelectedBotRespond(botId) {
     const bot = characters.find(c => c.id === botId);
     const chatContainer = document.getElementById('group-chat-messages');
+    const face = bot.avatar || bot.imageUrl;
     
     // Add loading
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'bot-loading-' + botId;
-    loadingDiv.className = 'flex items-start gap-2 max-w-[85%]';
+    loadingDiv.className = 'flex items-start gap-2 max-w-[90%]';
     loadingDiv.innerHTML = `
-        ${bot.imageUrl ? `<img src="${bot.imageUrl}" class="w-10 h-10 rounded-full"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20"></div>'}
-        <div class="bg-surface-container rounded-2xl rounded-tl-none p-3 flex-1">
+        ${face ? `<img src="${face}" class="w-10 h-10 rounded-full object-cover border border-primary/40 flex-shrink-0"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0"></div>'}
+        <div class="bg-surface-container/90 backdrop-blur-sm rounded-2xl rounded-tl-none p-3 flex-1">
             <p class="text-[10px] text-primary font-bold mb-1">${bot.name}</p>
             <p class="text-sm loading-pulse">Thinking...</p>
         </div>
@@ -1393,6 +1433,10 @@ async function makeSelectedBotRespond(botId) {
         const groupName = document.getElementById('group-name').value;
         const context = document.getElementById('group-context').value;
         
+        // Pull last few messages from the chat as actual context
+        const recentTexts = Array.from(chatContainer.querySelectorAll('p'))
+            .map(p => p.textContent).filter(Boolean).slice(-6).join(' | ');
+        
         const response = await fetch(API_CONFIG.deepseek.url, {
             method: 'POST',
             headers: {
@@ -1404,9 +1448,9 @@ async function makeSelectedBotRespond(botId) {
                 messages: [
                     {
                         role: 'system',
-                        content: `You are ${bot.name} in a group chat called "${groupName}". Context: ${context}. ${bot.intro}. Respond in character briefly.`
+                        content: `You are ${bot.name} in a group chat called "${groupName}". Context: ${context}. ${bot.intro}. Respond in character briefly (1-3 sentences).`
                     },
-                    { role: 'user', content: 'Join the conversation with a brief message.' }
+                    { role: 'user', content: `Recent conversation: ${recentTexts || 'just starting'}. Reply naturally as ${bot.name}.` }
                 ],
                 stream: false,
                 temperature: 0.9
@@ -1418,13 +1462,22 @@ async function makeSelectedBotRespond(botId) {
         
         document.getElementById('bot-loading-' + botId).remove();
         
+        const respEncoded = encodeURIComponent(botResponse);
         const botMsg = document.createElement('div');
-        botMsg.className = 'flex items-start gap-2 max-w-[85%]';
+        botMsg.className = 'bot-bubble-wrapper flex items-start gap-2 max-w-[90%]';
         botMsg.innerHTML = `
-            ${bot.imageUrl ? `<img src="${bot.imageUrl}" class="w-10 h-10 rounded-full object-cover"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20"></div>'}
-            <div class="bg-surface-container rounded-2xl rounded-tl-none p-3 flex-1">
+            ${face ? `<img src="${face}" class="w-10 h-10 rounded-full object-cover border border-primary/40 flex-shrink-0"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0"></div>'}
+            <div class="bg-surface-container/90 backdrop-blur-sm rounded-2xl rounded-tl-none p-3 flex-1 border border-primary/20 relative">
                 <p class="text-[10px] text-primary font-bold mb-1">${bot.name}</p>
                 <p class="text-sm text-on-surface-variant">${botResponse}</p>
+                <div class="flex gap-2 justify-end mt-2 -mb-1">
+                    <button onclick="speakBubbleText(${bot.id}, '${respEncoded}')" class="text-on-surface-variant hover:text-primary transition-colors" title="Hear voice">
+                        <span class="material-symbols-outlined text-base">volume_up</span>
+                    </button>
+                    <button onclick="generateImageFromBubble(this, 'group', ${bot.id})" class="text-on-surface-variant hover:text-primary transition-colors" title="Generate in-context image">
+                        <span class="material-symbols-outlined text-base">image_search</span>
+                    </button>
+                </div>
             </div>
         `;
         chatContainer.appendChild(botMsg);
@@ -1435,6 +1488,31 @@ async function makeSelectedBotRespond(botId) {
         console.error('Bot response error:', error);
     }
 }
+
+async function generateGroupChatBackground() {
+    const prompt = document.getElementById('group-bg-prompt').value.trim();
+    if (!prompt) {
+        alert('Describe the background you want!');
+        return;
+    }
+    const btn = document.getElementById('generate-group-bg-btn');
+    const oldText = btn.textContent;
+    btn.textContent = 'GENERATING...';
+    btn.disabled = true;
+    try {
+        const imageUrl = await generateImage(prompt, 'portrait_16_9');
+        currentGroupChatBg = imageUrl;
+        const preview = document.getElementById('group-bg-preview');
+        preview.innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover"/>`;
+        btn.textContent = 'REGENERATE BACKGROUND';
+    } catch (err) {
+        alert('Background generation failed: ' + err.message);
+        btn.textContent = oldText;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 
 async function playBotVoiceInGroup(botId) {
     const bot = characters.find(c => c.id === botId);
@@ -1514,38 +1592,68 @@ const AppRouter = {
 
 /**
  * Character Forge Step Manager
+ *  - Saves ALL fields from every step on each transition
+ *  - Restores ALL fields when entering a step
+ *  - Persists across navigation until createCharacter() finalizes
  */
-function nextForgeStep(step) {
-    // Save current step data before moving
-    if (step === 2) {
-        // Coming from step 1, save identity data
-        currentCharacter.name = document.getElementById('char-name').value;
-        currentCharacter.gender = document.querySelector('.gender-option.selected')?.dataset.gender;
-        currentCharacter.intro = document.getElementById('char-intro').value;
-    } else if (step === 3) {
-        // Coming from step 2, save image data
-        currentCharacter.visualPrompt = document.getElementById('char-visual-prompt').value;
-        currentCharacter.style = document.querySelector('.style-option.selected')?.dataset.style;
-    } else if (step === 1) {
-        // Going back to step 1, restore data
-        if (currentCharacter.name) {
-            document.getElementById('char-name').value = currentCharacter.name;
-        }
-        if (currentCharacter.gender) {
-            document.querySelectorAll('.gender-option').forEach(opt => {
-                if (opt.dataset.gender === currentCharacter.gender) {
-                    selectGender(opt);
-                }
-            });
-        }
-        if (currentCharacter.intro) {
-            document.getElementById('char-intro').value = currentCharacter.intro;
-        }
+function saveAllForgeFields() {
+    // Step 1
+    const nameEl = document.getElementById('char-name');
+    const introEl = document.getElementById('char-intro');
+    const genderSel = document.querySelector('.gender-option.selected');
+    if (nameEl && nameEl.value !== '') currentCharacter.name = nameEl.value;
+    if (introEl && introEl.value !== '') currentCharacter.intro = introEl.value;
+    if (genderSel) currentCharacter.gender = genderSel.dataset.gender;
+    // Step 2
+    const visualEl = document.getElementById('char-visual-prompt');
+    const styleSel = document.querySelector('.style-option.selected');
+    const ratioSel = document.querySelector('.ratio-option.selected');
+    if (visualEl && visualEl.value !== '') currentCharacter.visualPrompt = visualEl.value;
+    if (styleSel) currentCharacter.style = styleSel.dataset.style;
+    if (ratioSel) currentCharacter.ratio = ratioSel.dataset.ratio;
+    // Step 3
+    const voiceEl = document.getElementById('voice-prompt');
+    if (voiceEl && voiceEl.value !== '') currentCharacter.voicePrompt = voiceEl.value;
+}
+
+function restoreAllForgeFields() {
+    if (currentCharacter.name) document.getElementById('char-name').value = currentCharacter.name;
+    if (currentCharacter.intro) document.getElementById('char-intro').value = currentCharacter.intro;
+    if (currentCharacter.gender) {
+        document.querySelectorAll('.gender-option').forEach(opt => {
+            if (opt.dataset.gender === currentCharacter.gender) selectGender(opt);
+        });
     }
+    if (currentCharacter.visualPrompt) document.getElementById('char-visual-prompt').value = currentCharacter.visualPrompt;
+    if (currentCharacter.style) {
+        document.querySelectorAll('.style-option').forEach(opt => {
+            if (opt.dataset.style === currentCharacter.style) selectStyle(opt);
+        });
+    }
+    if (currentCharacter.ratio) {
+        document.querySelectorAll('.ratio-option').forEach(opt => {
+            if (opt.dataset.ratio === currentCharacter.ratio) selectRatio(opt);
+        });
+    }
+    if (currentCharacter.imageUrl) {
+        document.getElementById('char-image-preview').classList.remove('hidden');
+        document.getElementById('char-generated-image').src = currentCharacter.imageUrl;
+        const btn = document.getElementById('generate-char-image-btn');
+        if (btn) btn.textContent = 'REGENERATE IMAGE';
+    }
+    if (currentCharacterAvatar) {
+        const preview = document.getElementById('char-avatar-preview');
+        if (preview) preview.innerHTML = `<img src="${currentCharacterAvatar}" alt="Avatar" class="w-full h-full object-cover"/>`;
+    }
+    if (currentCharacter.voicePrompt) document.getElementById('voice-prompt').value = currentCharacter.voicePrompt;
+}
+
+function nextForgeStep(step) {
+    // Always save every field before switching
+    saveAllForgeFields();
     
     // Show/hide steps
     document.querySelectorAll('.forge-step').forEach(s => s.classList.add('hidden'));
-    
     const targetStep = document.getElementById('forge-step-' + step);
     if (targetStep) targetStep.classList.remove('hidden');
 
@@ -1563,17 +1671,8 @@ function nextForgeStep(step) {
         }
     }
     
-    // Restore step 2 data if going back
-    if (step === 2 && currentCharacter.visualPrompt) {
-        document.getElementById('char-visual-prompt').value = currentCharacter.visualPrompt;
-        if (currentCharacter.style) {
-            document.querySelectorAll('.style-option').forEach(opt => {
-                if (opt.dataset.style === currentCharacter.style) {
-                    selectStyle(opt);
-                }
-            });
-        }
-    }
+    // Restore all fields after step is visible
+    restoreAllForgeFields();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1629,20 +1728,43 @@ function openSoloChat(botId) {
     document.getElementById('solo-chat-bot-name').textContent = bot.name;
     document.getElementById('solo-chat-bot-intro').textContent = bot.intro;
     
+    const avatarSrc = bot.avatar || bot.imageUrl;
     const avatar = document.getElementById('solo-chat-bot-avatar');
-    if (bot.imageUrl) {
-        avatar.innerHTML = `<img src="${bot.imageUrl}" alt="${bot.name}" class="w-full h-full object-cover rounded-full"/>`;
+    if (avatarSrc) {
+        avatar.innerHTML = `<img src="${avatarSrc}" alt="${bot.name}" class="w-full h-full object-cover"/>`;
     } else {
         avatar.innerHTML = '<span class="material-symbols-outlined text-primary text-4xl">smart_toy</span>';
     }
+
+    // Set chat background to full character image (transparent overlay handled by CSS)
+    const bg = document.getElementById('solo-chat-bg');
+    if (bot.imageUrl) {
+        bg.style.backgroundImage = `url("${bot.imageUrl}")`;
+        bg.style.opacity = '0.35';
+    } else {
+        bg.style.backgroundImage = 'none';
+        bg.style.opacity = '0';
+    }
     
-    // Clear messages
+    // Clear messages with welcome bubble (with avatar)
+    const introEncoded = encodeURIComponent(bot.intro || '');
     document.getElementById('solo-chat-messages').innerHTML = `
-        <div class="flex flex-col items-start max-w-[85%]">
-            <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
-                <p class="text-on-surface-variant leading-relaxed">${bot.intro}</p>
+        <div class="bot-bubble-wrapper flex items-start gap-2 max-w-[90%]">
+            ${avatarSrc ? `<img src="${avatarSrc}" alt="${bot.name}" class="w-10 h-10 rounded-full object-cover border border-primary/40 flex-shrink-0"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0"></div>'}
+            <div class="flex flex-col items-start flex-1">
+                <div class="bg-surface-container/90 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20 relative">
+                    <p class="text-on-surface-variant leading-relaxed">${bot.intro || ''}</p>
+                    <div class="flex gap-2 justify-end mt-2 -mb-1">
+                        <button onclick="speakBubbleText(${bot.id}, '${introEncoded}')" class="text-on-surface-variant hover:text-primary transition-colors" title="Hear voice">
+                            <span class="material-symbols-outlined text-base">volume_up</span>
+                        </button>
+                        <button onclick="generateImageFromBubble(this, 'solo', ${bot.id})" class="text-on-surface-variant hover:text-primary transition-colors" title="Generate in-context image">
+                            <span class="material-symbols-outlined text-base">image_search</span>
+                        </button>
+                    </div>
+                </div>
+                <span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">${bot.name.toUpperCase()}</span>
             </div>
-            <span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">${bot.name.toUpperCase()}</span>
         </div>
     `;
     
@@ -1653,6 +1775,8 @@ function openSoloChat(botId) {
 function closeSoloChat() {
     currentSoloChatBot = null;
     soloChatHistory = [];
+    const bg = document.getElementById('solo-chat-bg');
+    if (bg) { bg.style.backgroundImage = 'none'; bg.style.opacity = '0'; }
     showPage('circuit');
 }
 
@@ -1720,14 +1844,28 @@ async function sendSoloChatMessage(includeImage) {
         
         document.getElementById(loadingId).remove();
         
-        // Add bot response
+        // Add bot response with avatar bubble + per-bubble actions
+        const bot = currentSoloChatBot;
+        const avatarSrc = bot.avatar || bot.imageUrl;
+        const respEncoded = encodeURIComponent(botResponse);
         const botMsg = document.createElement('div');
-        botMsg.className = 'flex flex-col items-start max-w-[85%]';
+        botMsg.className = 'bot-bubble-wrapper flex items-start gap-2 max-w-[90%]';
         botMsg.innerHTML = `
-            <div class="bg-surface-container rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20">
-                <p class="text-on-surface-variant leading-relaxed">${botResponse}</p>
+            ${avatarSrc ? `<img src="${avatarSrc}" alt="${bot.name}" class="w-10 h-10 rounded-full object-cover border border-primary/40 flex-shrink-0"/>` : '<div class="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0"></div>'}
+            <div class="flex flex-col items-start flex-1">
+                <div class="bg-surface-container/90 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 shadow-sm border border-primary/20 relative">
+                    <p class="text-on-surface-variant leading-relaxed">${botResponse}</p>
+                    <div class="flex gap-2 justify-end mt-2 -mb-1">
+                        <button onclick="speakBubbleText(${bot.id}, '${respEncoded}')" class="text-on-surface-variant hover:text-primary transition-colors" title="Hear voice">
+                            <span class="material-symbols-outlined text-base">volume_up</span>
+                        </button>
+                        <button onclick="generateImageFromBubble(this, 'solo', ${bot.id})" class="text-on-surface-variant hover:text-primary transition-colors" title="Generate in-context image">
+                            <span class="material-symbols-outlined text-base">image_search</span>
+                        </button>
+                    </div>
+                </div>
+                <span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">${bot.name.toUpperCase()}</span>
             </div>
-            <span class="text-[10px] font-bold tracking-widest text-primary mt-2 ml-1">${currentSoloChatBot.name.toUpperCase()}</span>
         `;
         chatContainer.appendChild(botMsg);
         
@@ -1879,6 +2017,140 @@ function deletePersona(personaId) {
         personas = personas.filter(p => p.id !== personaId);
         localStorage.setItem('blazebot_personas', JSON.stringify(personas));
         renderPersonas();
+    }
+}
+
+/**
+ * Character Avatar (small circular face) handlers
+ */
+function previewCharacterAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentCharacterAvatar = e.target.result;
+        const preview = document.getElementById('char-avatar-preview');
+        preview.innerHTML = `<img src="${currentCharacterAvatar}" alt="Avatar" class="w-full h-full object-cover"/>`;
+    };
+    reader.readAsDataURL(file);
+}
+
+function generateAvatarFromFullImage() {
+    if (!currentCharacter.imageUrl) {
+        alert('Generate the full image first, then click here to use it as the avatar face.');
+        return;
+    }
+    currentCharacterAvatar = currentCharacter.imageUrl;
+    const preview = document.getElementById('char-avatar-preview');
+    preview.innerHTML = `<img src="${currentCharacterAvatar}" alt="Avatar" class="w-full h-full object-cover"/>`;
+}
+
+/**
+ * In-chat per-bubble image generation
+ *  - reads recent chat history for context
+ *  - uses bot's visual style/prompt to keep it on-character
+ */
+async function generateImageFromBubble(btnEl, scope, botId) {
+    const bot = characters.find(c => c.id === botId);
+    if (!bot) return;
+
+    // Pull last few message texts as context
+    const containerId = scope === 'solo' ? 'solo-chat-messages' : 'group-chat-messages';
+    const container = document.getElementById(containerId);
+    const allMsgs = Array.from(container.querySelectorAll('p')).map(p => p.textContent).filter(Boolean);
+    const recent = allMsgs.slice(-4).join(' ');
+
+    // Build a prompt anchored on this character + chat context
+    const fullPrompt = `${bot.style || 'realistic'} style, ${bot.visualPrompt || bot.intro || bot.name}. Scene: ${recent}`;
+
+    // Loading bubble appended right after the source bubble
+    const wrapper = btnEl.closest('.bot-bubble-wrapper');
+    const loading = document.createElement('div');
+    loading.className = 'flex flex-col items-center w-full mt-2';
+    loading.innerHTML = `
+        <div class="bg-surface-container rounded-xl p-4 w-full max-w-md border border-primary/20">
+            <p class="text-sm text-on-surface-variant text-center loading-pulse">Generating in-context image...</p>
+        </div>`;
+    wrapper.parentNode.insertBefore(loading, wrapper.nextSibling);
+
+    btnEl.disabled = true;
+    const oldHTML = btnEl.innerHTML;
+    btnEl.innerHTML = '<span class="material-symbols-outlined text-xs animate-spin">progress_activity</span>';
+
+    try {
+        const imageUrl = await generateImage(fullPrompt, 'square_hd');
+        loading.remove();
+        const imgMsg = document.createElement('div');
+        imgMsg.className = 'flex flex-col items-center w-full mt-2';
+        imgMsg.innerHTML = `
+            <div class="bg-surface-container rounded-2xl overflow-hidden p-2 max-w-md border border-primary/20">
+                <img src="${imageUrl}" alt="Generated" class="w-full rounded-xl"/>
+                <p class="text-[10px] text-primary text-center mt-2 uppercase tracking-widest">${bot.name} · in-context</p>
+            </div>`;
+        wrapper.parentNode.insertBefore(imgMsg, wrapper.nextSibling);
+        imgMsg.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } catch (err) {
+        loading.remove();
+        alert('Image generation failed: ' + err.message);
+    } finally {
+        btnEl.disabled = false;
+        btnEl.innerHTML = oldHTML;
+    }
+}
+
+/**
+ * Speak a bot's last message in the solo chat
+ */
+async function speakLastSoloMessage() {
+    if (!currentSoloChatBot) return;
+    const messages = soloChatHistory.filter(m => m.role === 'assistant');
+    const text = messages.length > 0
+        ? messages[messages.length - 1].content
+        : `Hello! I'm ${currentSoloChatBot.name}. ${currentSoloChatBot.intro}`;
+    try {
+        const keys = getAPIKeys();
+        const voiceId = currentSoloChatBot.voiceId || 'pNInz6obpgDQGcFmaJgB';
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'xi-api-key': keys.elevenlabs },
+            body: JSON.stringify({
+                text: text.slice(0, 500),
+                model_id: 'eleven_turbo_v2_5',
+                voice_settings: currentSoloChatBot.voiceSettings || { stability: 0.75, similarity_boost: 0.90 }
+            })
+        });
+        if (!response.ok) throw new Error('Voice failed: ' + response.status);
+        const audioBlob = await response.blob();
+        new Audio(URL.createObjectURL(audioBlob)).play();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+/**
+ * Speak a specific message text (per-bubble speaker)
+ */
+async function speakBubbleText(botId, encodedText) {
+    const bot = characters.find(c => c.id === botId);
+    if (!bot) return;
+    const text = decodeURIComponent(encodedText);
+    try {
+        const keys = getAPIKeys();
+        const voiceId = bot.voiceId || 'pNInz6obpgDQGcFmaJgB';
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'xi-api-key': keys.elevenlabs },
+            body: JSON.stringify({
+                text: text.slice(0, 500),
+                model_id: 'eleven_turbo_v2_5',
+                voice_settings: bot.voiceSettings || { stability: 0.75, similarity_boost: 0.90 }
+            })
+        });
+        if (!response.ok) throw new Error('Voice failed');
+        const audioBlob = await response.blob();
+        new Audio(URL.createObjectURL(audioBlob)).play();
+    } catch (err) {
+        console.error('Voice error:', err);
     }
 }
 
