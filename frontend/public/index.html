@@ -771,7 +771,8 @@ async function generateImage(prompt, aspectRatio = 'square_hd') {
                 image_size: aspectRatio,
                 num_inference_steps: 8,
                 num_images: 1,
-                enable_safety_checker: false
+                enable_safety_checker: false,
+                has_nsfw_concepts: [false]
             })
         });
         
